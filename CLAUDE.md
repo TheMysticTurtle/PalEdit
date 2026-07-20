@@ -129,6 +129,28 @@ needs a stub logger.
   `event_generate("<Return>")` is flaky without real focus — test via the
   direct code paths (`changeskill(n, code)`, `attacks[n].set + changeattack`).
 
+## Owner feedback 2026-07-20 (TODO next session — verbatim requests)
+
+1. **Attacks**: "abilities still aren't filtered down to what that pal can
+   use? … it should show any that can be applied to them." They ARE filtered
+   (foreign uniques removed) but the list is still ~147 long because skill
+   fruits legally teach any non-unique move. Owner expects a tighter list —
+   add a tiered filter, probably default to **learnset-only** (what the pal
+   naturally learns, `PalLearnSet`), with "obtainable (fruits)" and "all" as
+   escalations. ALSO: confirm the owner relaunched the NEW exe — if they
+   tested the old build the filtering wasn't there at all.
+2. **Passives**: "only the ones for that pal" — verify/tighten the legal set
+   (rollable ∪ innate; maybe they want it even tighter — ask or observe).
+   **Keep all tier variants pickable** (e.g. Legs_up_1/2/3 families — the
+   "different levels" of a passive), and **show each passive's stat buff** in
+   the picker — `PalInfo.PassiveDescriptions[code]` exists; show it as a
+   second column / detail line / tooltip in open_ability_search rows.
+3. **Species selector**: currently lists all 834 entries incl. humans,
+   RAID_/SUMMON_/Quest_/Oilrig junk. Filter to catchable pals + tower bosses.
+   Best signal: psp `pal_deck_index >= 0` = catchable (emit as e.g.
+   `DeckIndex` via update_data.py), `is_tower_boss` for GYM_. Keep the
+   current species in the list if the loaded pal is something exotic.
+
 ## Remaining polish ideas
 
 1. **Species swap** (works today, verified on a copy: Caprity→WorldTreeDragon
