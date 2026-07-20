@@ -37,5 +37,8 @@
         "Transport": 4,
         "MonsterFarm": 0
     },
-    "Human": false
+    "Human": false,
+    "InnatePassives": [
+        "ElementBoost_Thunder_2_PAL"
+    ]
 }

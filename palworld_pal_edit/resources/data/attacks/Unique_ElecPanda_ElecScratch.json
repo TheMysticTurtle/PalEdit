@@ -2,5 +2,10 @@
     "CodeName": "EPalWazaID::Unique_ElecPanda_ElecScratch",
     "Type": "Electricity",
     "Power": 150,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "ElecPanda",
+        "GYM_ElecPanda",
+        "GYM_ElecPanda_Otomo"
+    ]
 }

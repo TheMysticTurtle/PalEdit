@@ -2,5 +2,10 @@
     "CodeName": "EPalWazaID::Unique_ThunderDog_Bite",
     "Type": "Electricity",
     "Power": 50,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "POLICE_ThunderDog",
+        "PREDATOR_ThunderDog",
+        "ThunderDog"
+    ]
 }

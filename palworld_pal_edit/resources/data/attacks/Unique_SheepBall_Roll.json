@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_SheepBall_Roll",
     "Type": "Normal",
     "Power": 40,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "Quest_Farmer03_SheepBall",
+        "Sheepball"
+    ]
 }

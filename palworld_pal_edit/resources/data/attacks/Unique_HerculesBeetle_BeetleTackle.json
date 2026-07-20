@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_HerculesBeetle_BeetleTackle",
     "Type": "Earth",
     "Power": 250,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "HerculesBeetle",
+        "HerculesBeetle_Ground"
+    ]
 }

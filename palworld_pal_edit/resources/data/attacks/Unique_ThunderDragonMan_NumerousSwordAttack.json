@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_ThunderDragonMan_NumerousSwordAttack",
     "Type": "Electricity",
     "Power": 600,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "GYM_ThunderDragonMan_2",
+        "ThunderDragonMan"
+    ]
 }

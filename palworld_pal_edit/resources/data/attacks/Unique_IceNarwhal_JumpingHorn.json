@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_IceNarwhal_JumpingHorn",
     "Type": "Ice",
     "Power": 600,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "IceNarwhal",
+        "IceNarwhal_Fire"
+    ]
 }

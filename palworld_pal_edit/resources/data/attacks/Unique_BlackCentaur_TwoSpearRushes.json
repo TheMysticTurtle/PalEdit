@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_BlackCentaur_TwoSpearRushes",
     "Type": "Dark",
     "Power": 700,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "BlackCentaur"
+    ]
 }

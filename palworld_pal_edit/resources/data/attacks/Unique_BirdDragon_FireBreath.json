@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_BirdDragon_FireBreath",
     "Type": "Fire",
     "Power": 200,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "BirdDragon",
+        "PREDATOR_BirdDragon"
+    ]
 }

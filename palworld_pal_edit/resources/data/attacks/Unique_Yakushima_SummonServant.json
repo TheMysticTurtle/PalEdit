@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_Yakushima_SummonServant",
     "Type": "Dark",
     "Power": 300,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "YakushimaBoss001"
+    ]
 }

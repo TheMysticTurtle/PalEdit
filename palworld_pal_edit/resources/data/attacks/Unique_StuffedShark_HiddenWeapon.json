@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_StuffedShark_HiddenWeapon",
     "Type": "Water",
     "Power": 300,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "StuffedShark",
+        "StuffedShark_Fire"
+    ]
 }

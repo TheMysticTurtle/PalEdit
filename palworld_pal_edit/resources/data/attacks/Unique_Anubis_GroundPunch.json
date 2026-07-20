@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_Anubis_GroundPunch",
     "Type": "Earth",
     "Power": 500,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "Anubis"
+    ]
 }

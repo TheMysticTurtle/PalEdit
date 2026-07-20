@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_GhostAnglerfish_Fire_SweepBait_Fire",
     "Type": "Fire",
     "Power": 450,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "GhostAnglerfish_Fire"
+    ]
 }

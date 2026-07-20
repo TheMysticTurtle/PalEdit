@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_Umihebi_Fire_FireWindingTackle",
     "Type": "Fire",
     "Power": 400,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "PREDATOR_Umihebi_Fire",
+        "Umihebi_Fire"
+    ]
 }

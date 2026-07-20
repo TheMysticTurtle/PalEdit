@@ -2,5 +2,10 @@
     "CodeName": "EPalWazaID::Unique_DarkMechaDragon_WarpComet",
     "Type": "Dragon",
     "Power": 600,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "DarkMechaDragon",
+        "RAID_DarkMechaDragon",
+        "RAID_DarkMechaDragon_2"
+    ]
 }

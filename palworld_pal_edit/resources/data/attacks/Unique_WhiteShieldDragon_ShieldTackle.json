@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_WhiteShieldDragon_ShieldTackle",
     "Type": "Dragon",
     "Power": 600,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "PREDATOR_WhiteShieldDragon_Quest",
+        "WhiteShieldDragon"
+    ]
 }

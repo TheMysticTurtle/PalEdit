@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_Kirin_Ice_IceTackle",
     "Type": "Ice",
     "Power": 600,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "Kirin_Ice"
+    ]
 }

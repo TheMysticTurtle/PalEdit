@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_Anubis_LowRoundKick",
     "Type": "Earth",
     "Power": 300,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "Anubis"
+    ]
 }

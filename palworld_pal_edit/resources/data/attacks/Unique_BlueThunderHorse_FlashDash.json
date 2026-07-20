@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_BlueThunderHorse_FlashDash",
     "Type": "Electricity",
     "Power": 600,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "BlueThunderHorse"
+    ]
 }

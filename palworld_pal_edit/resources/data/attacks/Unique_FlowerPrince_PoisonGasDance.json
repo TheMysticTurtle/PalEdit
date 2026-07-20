@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_FlowerPrince_PoisonGasDance",
     "Type": "Dark",
     "Power": 800,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "FlowerPrince"
+    ]
 }

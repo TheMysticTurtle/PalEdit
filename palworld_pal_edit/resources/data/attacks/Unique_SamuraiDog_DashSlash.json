@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_SamuraiDog_DashSlash",
     "Type": "Earth",
     "Power": 90,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "SamuraiDog"
+    ]
 }

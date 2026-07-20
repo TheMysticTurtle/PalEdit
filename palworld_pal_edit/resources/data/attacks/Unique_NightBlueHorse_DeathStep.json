@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_NightBlueHorse_DeathStep",
     "Type": "Dark",
     "Power": 550,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "NightBlueHorse",
+        "PREDATOR_NightBlueHorse"
+    ]
 }

@@ -1053,6 +1053,7 @@ def LoadPals(lang="en-GB"):
             PalSpecies[i["CodeName"]] = PalObject(l[i["CodeName"]] if i["CodeName"] in l else i["CodeName"], i["CodeName"], p, s, h, t,
                                                   i["Scaling"] if "Scaling" in i else None,
                                                   i["Suitabilities"] if "Suitabilities" in i else {})
+            PalSpecies[i["CodeName"]]._innate_passives = i.get("InnatePassives", [])
             if t:
                 PalSpecies[i["CodeName"]]._suits = PalSpecies[i["CodeName"].replace("GYM_", "")]._suits
                 PalSpecies[i["CodeName"]]._scaling = PalSpecies[i["CodeName"].replace("GYM_", "")]._scaling
@@ -1064,14 +1065,16 @@ LoadPals()
 PalPassives = {}
 PassiveDescriptions = {}
 PassiveRating = {}
+PassiveRollable = {}
 
 
 def LoadPassives(lang="en-GB"):
-    global PalPassives, PassiveDescriptions, PassiveRating
+    global PalPassives, PassiveDescriptions, PassiveRating, PassiveRollable
 
     PalPassives = {}
     PassiveDescriptions = {}
     PassiveRating = {}
+    PassiveRollable = {}
 
     if lang == "":
         lang = "en-GB"
@@ -1092,10 +1095,23 @@ def LoadPassives(lang="en-GB"):
                 PalPassives[code] = l[code]["Name"]
                 PassiveDescriptions[code] = l[code]["Description"]
                 PassiveRating[code] = d[i]["Rating"]
+                # default True so passives without data are never hidden
+                PassiveRollable[code] = d[i].get("Rollable", True)
                 #print(i, l[code]["Name"])
             PalPassives = dict(sorted(PalPassives.items()))
 
 LoadPassives()
+
+
+def GetLegalPassives(species_code):
+    """Passive codes a pal of this species can normally have: any passive
+    that rolls on wild/lucky pals plus the species' innate passives."""
+    innate = []
+    if species_code in PalSpecies:
+        innate = getattr(PalSpecies[species_code], "_innate_passives", [])
+    return [c for c in PalPassives
+            if c not in ("NONE", "UNKNOWN", "None", "Unknown")
+            and (PassiveRollable.get(c, True) or c in innate)]
 
 # PalAttacks CodeName -> Name
 PalAttacks = {}

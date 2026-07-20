@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_GuardianDog_Bite",
     "Type": "Normal",
     "Power": 50,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "GuardianDog"
+    ]
 }

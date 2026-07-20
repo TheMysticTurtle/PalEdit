@@ -1,29 +1,15 @@
 {
     "key": {
-        "PlayerUId": {
-            "struct_type": "Guid",
-            "struct_id": "00000000-0000-0000-0000-000000000000",
-            "id": null,
-            "value": "00000000-0000-0000-0000-000000000001",
-            "type": "StructProperty"
-        },
         "InstanceId": {
             "struct_type": "Guid",
             "struct_id": "00000000-0000-0000-0000-000000000000",
             "id": null,
-            "value": "7f5c0dbb-4a59-0395-6d28-948f680e2995",
+            "value": "812f5d5d-f4cb-49e4-a3bd-fde435ad0a2f",
             "type": "StructProperty"
-        },
-        "DebugName": {
-            "id": null,
-            "value": "",
-            "type": "StrProperty"
         }
     },
     "value": {
         "RawData": {
-            "array_type": "ByteProperty",
-            "id": null,
             "value": {
                 "object": {
                     "SaveParameter": {
@@ -33,14 +19,19 @@
                         "value": {
                             "CharacterID": {
                                 "id": null,
-                                "value": "BOSS_Hunter_Fat_GatlingGun",
+                                "value": "RAID_YakushimaBoss001_Green",
+                                "type": "NameProperty"
+                            },
+                            "UniqueNPCID": {
+                                "id": null,
+                                "value": "None",
                                 "type": "NameProperty"
                             },
                             "Gender": {
                                 "id": null,
                                 "value": {
                                     "type": "EPalGenderType",
-                                    "value": "EPalGenderType::Male"
+                                    "value": "EPalGenderType::Female"
                                 },
                                 "type": "EnumProperty"
                             },
@@ -48,7 +39,7 @@
                                 "id": null,
                                 "value": {
                                     "type": "None",
-                                    "value": 60
+                                    "value": 16
                                 },
                                 "type": "ByteProperty"
                             },
@@ -56,15 +47,20 @@
                                 "id": null,
                                 "value": {
                                     "type": "None",
-                                    "value": 5
+                                    "value": 1
                                 },
                                 "type": "ByteProperty"
+                            },
+                            "RankUpExp": {
+                                "id": null,
+                                "value": 0,
+                                "type": "UInt16Property"
                             },
                             "Rank_HP": {
                                 "id": null,
                                 "value": {
                                     "type": "None",
-                                    "value": 20
+                                    "value": 0
                                 },
                                 "type": "ByteProperty"
                             },
@@ -72,7 +68,7 @@
                                 "id": null,
                                 "value": {
                                     "type": "None",
-                                    "value": 20
+                                    "value": 0
                                 },
                                 "type": "ByteProperty"
                             },
@@ -80,7 +76,7 @@
                                 "id": null,
                                 "value": {
                                     "type": "None",
-                                    "value": 20
+                                    "value": 0
                                 },
                                 "type": "ByteProperty"
                             },
@@ -88,23 +84,43 @@
                                 "id": null,
                                 "value": {
                                     "type": "None",
-                                    "value": 20
+                                    "value": 0
                                 },
                                 "type": "ByteProperty"
                             },
                             "Exp": {
                                 "id": null,
-                                "value": 16625481,
+                                "value": 4007,
                                 "type": "Int64Property"
+                            },
+                            "NickName": {
+                                "id": null,
+                                "value": "",
+                                "type": "StrProperty"
+                            },
+                            "FilteredNickName": {
+                                "id": null,
+                                "value": "",
+                                "type": "StrProperty"
+                            },
+                            "IsRarePal": {
+                                "value": false,
+                                "id": null,
+                                "type": "BoolProperty"
+                            },
+                            "bIsAwakening": {
+                                "value": false,
+                                "id": null,
+                                "type": "BoolProperty"
                             },
                             "EquipWaza": {
                                 "array_type": "EnumProperty",
                                 "id": null,
                                 "value": {
                                     "values": [
-                                        "EPalWazaID::SpreadPulse",
-                                        "EPalWazaID::LineThunder",
-                                        "EPalWazaID::Unique_ElecPanda_GatlingAttack"
+                                        "EPalWazaID::MudShot",
+                                        "EPalWazaID::AquaJet",
+                                        "EPalWazaID::WaterGun"
                                     ]
                                 },
                                 "type": "ArrayProperty"
@@ -114,104 +130,13 @@
                                 "id": null,
                                 "value": {
                                     "values": [
-                                        "EPalWazaID::AquaJet",
                                         "EPalWazaID::WaterGun",
-                                        "EPalWazaID::BubbleShot",
-                                        "EPalWazaID::AcidRain",
-                                        "EPalWazaID::WaterBall",
-                                        "EPalWazaID::HydroPump",
-                                        "EPalWazaID::AirCanon",
-                                        "EPalWazaID::PowerShot",
-                                        "EPalWazaID::PowerBall",
-                                        "EPalWazaID::HyperBeam",
-                                        "EPalWazaID::SelfDestruct",
-                                        "EPalWazaID::SelfExplosion",
-                                        "EPalWazaID::WindCutter",
-                                        "EPalWazaID::SeedMachinegun",
-                                        "EPalWazaID::SpecialCutter",
-                                        "EPalWazaID::SeedMine",
-                                        "EPalWazaID::GrassTornado",
-                                        "EPalWazaID::RootAttack",
-                                        "EPalWazaID::SolarBeam",
-                                        "EPalWazaID::IceMissile",
-                                        "EPalWazaID::IceBlade",
-                                        "EPalWazaID::BlizzardLance",
-                                        "EPalWazaID::FrostBreath",
-                                        "EPalWazaID::IcicleThrow",
-                                        "EPalWazaID::FireBlast",
-                                        "EPalWazaID::FireSeed",
-                                        "EPalWazaID::FlareArrow",
-                                        "EPalWazaID::Flamethrower",
-                                        "EPalWazaID::FlareTornado",
-                                        "EPalWazaID::Inferno",
-                                        "EPalWazaID::FireBall",
-                                        "EPalWazaID::CrossThunder",
-                                        "EPalWazaID::ThunderRain",
-                                        "EPalWazaID::SpreadPulse",
-                                        "EPalWazaID::ElecWave",
-                                        "EPalWazaID::ThunderBall",
-                                        "EPalWazaID::ThunderFunnel",
-                                        "EPalWazaID::LockonLaser",
-                                        "EPalWazaID::Unique_ElecPanda_ElecScratch",
-                                        "EPalWazaID::LineThunder",
-                                        "EPalWazaID::ThreeThunder",
-                                        "EPalWazaID::LightningStrike",
-                                        "EPalWazaID::Thunderbolt",
+                                        "EPalWazaID::AquaJet",
                                         "EPalWazaID::MudShot",
-                                        "EPalWazaID::StoneShotgun",
-                                        "EPalWazaID::ThrowRock",
-                                        "EPalWazaID::SandTornado",
-                                        "EPalWazaID::RockLance",
-                                        "EPalWazaID::DragonCanon",
-                                        "EPalWazaID::DragonWave",
-                                        "EPalWazaID::DragonBreath",
-                                        "EPalWazaID::DragonMeteor",
-                                        "EPalWazaID::PoisonFog",
-                                        "EPalWazaID::PoisonShot",
-                                        "EPalWazaID::DarkBall",
-                                        "EPalWazaID::DarkWave",
-                                        "EPalWazaID::GhostFlame",
-                                        "EPalWazaID::ShadowBall",
-                                        "EPalWazaID::Psychokinesis",
-                                        "EPalWazaID::DarkLaser",
-                                        "EPalWazaID::DarkLegion",
-                                        "EPalWazaID::Tremor",
-                                        "EPalWazaID::DiamondFall",
-                                        "EPalWazaID::BeamSlicer",
-                                        "EPalWazaID::Commet",
-                                        "EPalWazaID::DarkPulse",
-                                        "EPalWazaID::DarkCanon",
-                                        "EPalWazaID::DarkArrow",
-                                        "EPalWazaID::Apocalypse",
-                                        "EPalWazaID::RootLance",
-                                        "EPalWazaID::LineGeyser",
-                                        "EPalWazaID::ChargeCanon",
-                                        "EPalWazaID::BlastCanon",
-                                        "EPalWazaID::ThreeCommet",
-                                        "EPalWazaID::CommetRain",
-                                        "EPalWazaID::Eruption",
-                                        "EPalWazaID::Unique_ElecPanda_GatlingAttack",
-                                        "EPalWazaID::HolyBlast",
-                                        "EPalWazaID::FlameWall",
-                                        "EPalWazaID::AirBlade",
-                                        "EPalWazaID::WallSplash",
-                                        "EPalWazaID::TriSpark",
-                                        "EPalWazaID::ThunderStorm",
-                                        "EPalWazaID::FlameFunnel",
-                                        "EPalWazaID::SandTwister",
-                                        "EPalWazaID::RangeThunder",
-                                        "EPalWazaID::Railbolt",
-                                        "EPalWazaID::ShokeiLaser",
-                                        "EPalWazaID::BubbleShower",
-                                        "EPalWazaID::MAX",
-                                        "EPalWazaID::IciclePierce",
-                                        "EPalWazaID::DoubleIcicleThrow",
-                                        "EPalWazaID::IceAge",
-                                        "EPalWazaID::RaidCutter",
-                                        "EPalWazaID::WindEdge",
-                                        "EPalWazaID::FlareTwister",
-                                        "EPalWazaID::IcicleLine",
-                                        "EPalWazaID::RockBeat"
+                                        "EPalWazaID::Unique_YakushimaBoss001_Green_PhantasmalBolt",
+                                        "EPalWazaID::Unique_YakushimaBoss001_Green_PhantasmalEye",
+                                        "EPalWazaID::Unique_YakushimaBoss001_Green_PhantasmalSphere",
+                                        "EPalWazaID::Unique_YakushimaBoss001_Green_PhantasmalDeathray"
                                     ]
                                 },
                                 "type": "ArrayProperty"
@@ -223,7 +148,7 @@
                                 "value": {
                                     "Value": {
                                         "id": null,
-                                        "value": 8643000,
+                                        "value": 1296000,
                                         "type": "Int64Property"
                                     }
                                 },
@@ -233,7 +158,7 @@
                                 "id": null,
                                 "value": {
                                     "type": "None",
-                                    "value": 78
+                                    "value": 93
                                 },
                                 "type": "ByteProperty"
                             },
@@ -241,7 +166,7 @@
                                 "id": null,
                                 "value": {
                                     "type": "None",
-                                    "value": 46
+                                    "value": 20
                                 },
                                 "type": "ByteProperty"
                             },
@@ -249,40 +174,58 @@
                                 "id": null,
                                 "value": {
                                     "type": "None",
-                                    "value": 57
+                                    "value": 97
                                 },
                                 "type": "ByteProperty"
                             },
                             "FullStomach": {
                                 "id": null,
-                                "value": 98.52490997314453,
+                                "value": 100.0,
                                 "type": "FloatProperty"
+                            },
+                            "PhysicalHealth": {
+                                "id": null,
+                                "value": {
+                                    "type": "EPalStatusPhysicalHealthType",
+                                    "value": "EPalStatusPhysicalHealthType::Healthful"
+                                },
+                                "type": "EnumProperty"
+                            },
+                            "WorkerSick": {
+                                "id": null,
+                                "value": {
+                                    "type": "EPalBaseCampWorkerSickType",
+                                    "value": "EPalBaseCampWorkerSickType::None"
+                                },
+                                "type": "EnumProperty"
                             },
                             "PassiveSkillList": {
                                 "array_type": "NameProperty",
                                 "id": null,
                                 "value": {
                                     "values": [
-                                        "Rare",
-                                        "Legend",
-                                        "ElementBoost_Thunder_2_PAL",
-                                        "PAL_ALLAttack_up2"
+                                        "CoolTimeReduction_Up_2"
                                     ]
                                 },
                                 "type": "ArrayProperty"
+                            },
+                            "IsPlayer": {
+                                "value": false,
+                                "id": null,
+                                "type": "BoolProperty"
                             },
                             "OwnedTime": {
                                 "struct_type": "DateTime",
                                 "struct_id": "00000000-0000-0000-0000-000000000000",
                                 "id": null,
-                                "value": 638709356883410000,
+                                "value": 639200342342720000,
                                 "type": "StructProperty"
                             },
                             "OwnerPlayerUId": {
                                 "struct_type": "Guid",
                                 "struct_id": "00000000-0000-0000-0000-000000000000",
                                 "id": null,
-                                "value": "00000000-0000-0000-0000-000000000001",
+                                "value": "00000000-0000-0000-0000-000000000000",
                                 "type": "StructProperty"
                             },
                             "OldOwnerPlayerUIds": {
@@ -292,12 +235,71 @@
                                     "prop_name": "OldOwnerPlayerUIds",
                                     "prop_type": "StructProperty",
                                     "values": [
-                                        "00000000-0000-0000-0000-000000000001"
+                                        "442e21f7-0000-0000-0000-000000000000"
                                     ],
                                     "type_name": "Guid",
                                     "id": "00000000-0000-0000-0000-000000000000"
                                 },
                                 "type": "ArrayProperty"
+                            },
+                            "ShieldHP": {
+                                "struct_type": "FixedPoint64",
+                                "struct_id": "00000000-0000-0000-0000-000000000000",
+                                "id": null,
+                                "value": {
+                                    "Value": {
+                                        "id": null,
+                                        "value": 0,
+                                        "type": "Int64Property"
+                                    }
+                                },
+                                "type": "StructProperty"
+                            },
+                            "bApplyShieldDamage": {
+                                "value": false,
+                                "id": null,
+                                "type": "BoolProperty"
+                            },
+                            "HungerType": {
+                                "id": null,
+                                "value": {
+                                    "type": "EPalStatusHungerType",
+                                    "value": "EPalStatusHungerType::Default"
+                                },
+                                "type": "EnumProperty"
+                            },
+                            "SanityValue": {
+                                "id": null,
+                                "value": 100.0,
+                                "type": "FloatProperty"
+                            },
+                            "BaseCampWorkerEventType": {
+                                "id": null,
+                                "value": {
+                                    "type": "EPalBaseCampWorkerEventType",
+                                    "value": "EPalBaseCampWorkerEventType::None"
+                                },
+                                "type": "EnumProperty"
+                            },
+                            "BaseCampWorkerEventProgressTime": {
+                                "id": null,
+                                "value": 0.0,
+                                "type": "FloatProperty"
+                            },
+                            "ItemContainerId": {
+                                "struct_type": "PalContainerId",
+                                "struct_id": "00000000-0000-0000-0000-000000000000",
+                                "id": null,
+                                "value": {
+                                    "ID": {
+                                        "struct_type": "Guid",
+                                        "struct_id": "00000000-0000-0000-0000-000000000000",
+                                        "id": null,
+                                        "value": "00000000-0000-0000-0000-000000000000",
+                                        "type": "StructProperty"
+                                    }
+                                },
+                                "type": "StructProperty"
                             },
                             "SlotId": {
                                 "struct_type": "PalCharacterSlotId",
@@ -313,7 +315,7 @@
                                                 "struct_type": "Guid",
                                                 "struct_id": "00000000-0000-0000-0000-000000000000",
                                                 "id": null,
-                                                "value": "bf19a963-4d82-a23a-792e-cf923d26c595",
+                                                "value": "dc4e1878-618f-4a3a-8f31-5e96b05333f6",
                                                 "type": "StructProperty"
                                             }
                                         },
@@ -321,11 +323,16 @@
                                     },
                                     "SlotIndex": {
                                         "id": null,
-                                        "value": 0,
+                                        "value": 2,
                                         "type": "IntProperty"
                                     }
                                 },
                                 "type": "StructProperty"
+                            },
+                            "UnusedStatusPoint": {
+                                "id": null,
+                                "value": 0,
+                                "type": "UInt16Property"
                             },
                             "GotStatusPointList": {
                                 "array_type": "StructProperty",
@@ -490,9 +497,242 @@
                                 "struct_id": "00000000-0000-0000-0000-000000000000",
                                 "id": null,
                                 "value": {
-                                    "x": 80.76016306874527,
-                                    "y": 2.124984614152334e-12,
-                                    "z": 7317.010919900204
+                                    "x": 0.0,
+                                    "y": 0.0,
+                                    "z": 0.0
+                                },
+                                "type": "StructProperty"
+                            },
+                            "FoodWithStatusEffect": {
+                                "id": null,
+                                "value": "None",
+                                "type": "NameProperty"
+                            },
+                            "Tiemr_FoodWithStatusEffect": {
+                                "id": null,
+                                "value": 0,
+                                "type": "IntProperty"
+                            },
+                            "FoodRegeneEffectInfo": {
+                                "struct_type": "PalFoodRegeneInfo",
+                                "struct_id": "00000000-0000-0000-0000-000000000000",
+                                "id": null,
+                                "value": {
+                                    "ItemId": {
+                                        "id": null,
+                                        "value": "None",
+                                        "type": "NameProperty"
+                                    },
+                                    "EffectTime": {
+                                        "id": null,
+                                        "value": 0,
+                                        "type": "IntProperty"
+                                    },
+                                    "RemainingTime": {
+                                        "id": null,
+                                        "value": 0,
+                                        "type": "IntProperty"
+                                    },
+                                    "RegeneEfectParameters": {
+                                        "array_type": "StructProperty",
+                                        "id": null,
+                                        "value": {
+                                            "prop_name": "RegeneEfectParameters",
+                                            "prop_type": "StructProperty",
+                                            "values": [],
+                                            "type_name": "PalFoodRegeneEffectParameter",
+                                            "id": "00000000-0000-0000-0000-000000000000"
+                                        },
+                                        "type": "ArrayProperty"
+                                    }
+                                },
+                                "type": "StructProperty"
+                            },
+                            "FoodWithFullStomachKeep": {
+                                "id": null,
+                                "value": "None",
+                                "type": "NameProperty"
+                            },
+                            "Tiemr_FoodWithFullStomachKeep": {
+                                "id": null,
+                                "value": 0,
+                                "type": "IntProperty"
+                            },
+                            "CurrentWorkSuitability": {
+                                "id": null,
+                                "value": {
+                                    "type": "EPalWorkSuitability",
+                                    "value": "EPalWorkSuitability::None"
+                                },
+                                "type": "EnumProperty"
+                            },
+                            "WorkSuitabilityOptionInfo": {
+                                "struct_type": "PalWorkSuitabilityPreferenceInfo",
+                                "struct_id": "00000000-0000-0000-0000-000000000000",
+                                "id": null,
+                                "value": {
+                                    "OffWorkSuitabilityList": {
+                                        "array_type": "EnumProperty",
+                                        "id": null,
+                                        "value": {
+                                            "values": []
+                                        },
+                                        "type": "ArrayProperty"
+                                    },
+                                    "bAllowBaseCampBattle": {
+                                        "value": true,
+                                        "id": null,
+                                        "type": "BoolProperty"
+                                    }
+                                },
+                                "type": "StructProperty"
+                            },
+                            "bAppliedDeathPenarty": {
+                                "value": false,
+                                "id": null,
+                                "type": "BoolProperty"
+                            },
+                            "bEnablePlayerRespawnInHardcore": {
+                                "value": false,
+                                "id": null,
+                                "type": "BoolProperty"
+                            },
+                            "PalReviveTimer": {
+                                "id": null,
+                                "value": 0.0,
+                                "type": "FloatProperty"
+                            },
+                            "VoiceID": {
+                                "id": null,
+                                "value": {
+                                    "type": "None",
+                                    "value": 0
+                                },
+                                "type": "ByteProperty"
+                            },
+                            "SkinAppliedCharacterId": {
+                                "struct_type": "Guid",
+                                "struct_id": "00000000-0000-0000-0000-000000000000",
+                                "id": null,
+                                "value": "00000000-0000-0000-0000-000000000000",
+                                "type": "StructProperty"
+                            },
+                            "SkinName": {
+                                "id": null,
+                                "value": "None",
+                                "type": "NameProperty"
+                            },
+                            "FavoriteIndex": {
+                                "id": null,
+                                "value": {
+                                    "type": "None",
+                                    "value": 0
+                                },
+                                "type": "ByteProperty"
+                            },
+                            "MapObjectConcreteInstanceIdAssignedToExpedition": {
+                                "struct_type": "Guid",
+                                "struct_id": "00000000-0000-0000-0000-000000000000",
+                                "id": null,
+                                "value": "00000000-0000-0000-0000-000000000000",
+                                "type": "StructProperty"
+                            },
+                            "ArenaRestoreParameter": {
+                                "struct_type": "PalArenaCharacterRestoreParameter",
+                                "struct_id": "00000000-0000-0000-0000-000000000000",
+                                "id": null,
+                                "value": {
+                                    "bValid": {
+                                        "value": false,
+                                        "id": null,
+                                        "type": "BoolProperty"
+                                    },
+                                    "Hp": {
+                                        "struct_type": "FixedPoint64",
+                                        "struct_id": "00000000-0000-0000-0000-000000000000",
+                                        "id": null,
+                                        "value": {
+                                            "Value": {
+                                                "id": null,
+                                                "value": 0,
+                                                "type": "Int64Property"
+                                            }
+                                        },
+                                        "type": "StructProperty"
+                                    },
+                                    "FullStomach": {
+                                        "id": null,
+                                        "value": 0.0,
+                                        "type": "FloatProperty"
+                                    },
+                                    "SanityValue": {
+                                        "id": null,
+                                        "value": 0.0,
+                                        "type": "FloatProperty"
+                                    },
+                                    "WorkerSick": {
+                                        "id": null,
+                                        "value": {
+                                            "type": "EPalBaseCampWorkerSickType",
+                                            "value": "EPalBaseCampWorkerSickType::None"
+                                        },
+                                        "type": "EnumProperty"
+                                    },
+                                    "FoodWithStatusEffect": {
+                                        "id": null,
+                                        "value": "None",
+                                        "type": "NameProperty"
+                                    },
+                                    "Tiemr_FoodWithStatusEffect": {
+                                        "id": null,
+                                        "value": 0,
+                                        "type": "IntProperty"
+                                    },
+                                    "FoodRegeneEffectInfo": {
+                                        "struct_type": "PalFoodRegeneInfo",
+                                        "struct_id": "00000000-0000-0000-0000-000000000000",
+                                        "id": null,
+                                        "value": {
+                                            "ItemId": {
+                                                "id": null,
+                                                "value": "None",
+                                                "type": "NameProperty"
+                                            },
+                                            "EffectTime": {
+                                                "id": null,
+                                                "value": 0,
+                                                "type": "IntProperty"
+                                            },
+                                            "RemainingTime": {
+                                                "id": null,
+                                                "value": 0,
+                                                "type": "IntProperty"
+                                            },
+                                            "RegeneEfectParameters": {
+                                                "array_type": "StructProperty",
+                                                "id": null,
+                                                "value": {
+                                                    "prop_name": "RegeneEfectParameters",
+                                                    "prop_type": "StructProperty",
+                                                    "values": [],
+                                                    "type_name": "PalFoodRegeneEffectParameter",
+                                                    "id": "00000000-0000-0000-0000-000000000000"
+                                                },
+                                                "type": "ArrayProperty"
+                                            }
+                                        },
+                                        "type": "StructProperty"
+                                    },
+                                    "FoodWithFullStomachKeep": {
+                                        "id": null,
+                                        "value": "None",
+                                        "type": "NameProperty"
+                                    },
+                                    "Tiemr_FoodWithFullStomachKeep": {
+                                        "id": null,
+                                        "value": 0,
+                                        "type": "IntProperty"
+                                    }
                                 },
                                 "type": "StructProperty"
                             },
@@ -708,13 +948,85 @@
                                 "struct_type": "Guid",
                                 "struct_id": "00000000-0000-0000-0000-000000000000",
                                 "id": null,
-                                "value": "00000000-0000-0000-0000-000000000001",
+                                "value": "442e21f7-0000-0000-0000-000000000000",
                                 "type": "StructProperty"
                             },
-                            "IsRarePal": {
+                            "bImportedCharacter": {
+                                "value": true,
+                                "id": null,
+                                "type": "BoolProperty"
+                            },
+                            "FriendshipPoint": {
+                                "id": null,
+                                "value": 0,
+                                "type": "IntProperty"
+                            },
+                            "FriendshipOtomoSec": {
+                                "id": null,
+                                "value": 14,
+                                "type": "IntProperty"
+                            },
+                            "FriendshipActiveOtomoSec": {
+                                "id": null,
+                                "value": 0,
+                                "type": "IntProperty"
+                            },
+                            "FriendshipBasecampSec": {
+                                "id": null,
+                                "value": 0,
+                                "type": "IntProperty"
+                            },
+                            "bFavoriteChangedByFriendship": {
                                 "value": false,
                                 "id": null,
                                 "type": "BoolProperty"
+                            },
+                            "ArenaRankPoint": {
+                                "id": null,
+                                "value": 0,
+                                "type": "IntProperty"
+                            },
+                            "bDisableSaleInPalLost": {
+                                "value": true,
+                                "id": null,
+                                "type": "BoolProperty"
+                            },
+                            "bIsExcludedFromTeamMission": {
+                                "value": false,
+                                "id": null,
+                                "type": "BoolProperty"
+                            },
+                            "WorkSuitabilityOverflowGrantedRankList": {
+                                "array_type": "StructProperty",
+                                "id": null,
+                                "value": {
+                                    "prop_name": "WorkSuitabilityOverflowGrantedRankList",
+                                    "prop_type": "StructProperty",
+                                    "values": [],
+                                    "type_name": "PalWorkSuitabilityOverflowGrantedInfo",
+                                    "id": "00000000-0000-0000-0000-000000000000"
+                                },
+                                "type": "ArrayProperty"
+                            },
+                            "PartnerSkillLastUsedTime": {
+                                "struct_type": "DateTime",
+                                "struct_id": "00000000-0000-0000-0000-000000000000",
+                                "id": null,
+                                "value": 0,
+                                "type": "StructProperty"
+                            },
+                            "PartnerSkillCoolDownTimeMax": {
+                                "id": null,
+                                "value": 0.0,
+                                "type": "FloatProperty"
+                            },
+                            "ExpTableMigrationVersion": {
+                                "id": null,
+                                "value": {
+                                    "type": "None",
+                                    "value": 0
+                                },
+                                "type": "ByteProperty"
                             },
                             "Talent_Melee": {
                                 "id": null,
@@ -727,50 +1039,8 @@
                         },
                         "type": "StructProperty"
                     }
-                },
-                "unknown_bytes": [
-                    0,
-                    0,
-                    0,
-                    0
-                ],
-                "group_id": "77982117-48af-f86d-51ca-7187b6038655"
-            },
-            "type": "ArrayProperty",
-            "custom_type": ".worldSaveData.CharacterSaveParameterMap.Value.RawData"
-        },
-        "CustomVersionData": {
-            "array_type": "ByteProperty",
-            "id": null,
-            "value": {
-                "values": [
-                    1,
-                    0,
-                    0,
-                    0,
-                    108,
-                    246,
-                    252,
-                    15,
-                    153,
-                    72,
-                    144,
-                    17,
-                    248,
-                    156,
-                    96,
-                    177,
-                    94,
-                    71,
-                    70,
-                    74,
-                    1,
-                    0,
-                    0,
-                    0
-                ]
-            },
-            "type": "ArrayProperty"
+                }
+            }
         }
     }
 }

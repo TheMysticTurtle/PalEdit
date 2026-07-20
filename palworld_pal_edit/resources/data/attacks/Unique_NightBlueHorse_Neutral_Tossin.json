@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_NightBlueHorse_Neutral_Tossin",
     "Type": "Normal",
     "Power": 700,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "NightBlueHorse_Neutral"
+    ]
 }

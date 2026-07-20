@@ -2,5 +2,11 @@
     "CodeName": "EPalWazaID::Unique_DarkAlien_JumpScractch",
     "Type": "Dark",
     "Power": 350,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "DarkAlien",
+        "DarkAlien_Oilrig",
+        "SUMMON_DarkAlien",
+        "SUMMON_DarkAlien_MAX"
+    ]
 }

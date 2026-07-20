@@ -46,5 +46,8 @@
         "Transport": 2,
         "MonsterFarm": 0
     },
-    "Human": false
+    "Human": false,
+    "InnatePassives": [
+        "ElementResist_Normal_1_PAL"
+    ]
 }

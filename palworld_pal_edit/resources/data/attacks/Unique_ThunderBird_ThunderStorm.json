@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_ThunderBird_ThunderStorm",
     "Type": "Electricity",
     "Power": 180,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "ThunderBird"
+    ]
 }

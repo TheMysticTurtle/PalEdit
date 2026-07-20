@@ -2,5 +2,10 @@
     "CodeName": "EPalWazaID::Unique_DarkScorpion_Pierce",
     "Type": "Earth",
     "Power": 350,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "DarkScorpion",
+        "DarkScorpion_Ground",
+        "PREDATOR_DarkScorpion"
+    ]
 }
