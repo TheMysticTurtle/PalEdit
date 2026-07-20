@@ -11,12 +11,13 @@
         "EPalWazaID::SeedMine": 22,
         "EPalWazaID::BubbleShower": 30,
         "EPalWazaID::RootAttack": 40,
-        "EPalWazaID::SolarBeam": 50
+        "EPalWazaID::SolarBeam": 50,
+        "EPalWazaID::WindBurst": 70
     },
     "RaidMoveset": {},
     "Scaling": {
         "HP": 105,
-        "PHY": 100,
+        "PHY": 95,
         "MAG": 95,
         "DEF": 100
     },

@@ -1,4 +1,5 @@
 __pycache__
+*.pyc
 current.pson
 build
 data.txt
@@ -6,6 +7,7 @@ log.txt
 venv
 dist
 PalEdit.spec
-PalEdit.exe
 compile_local.bat
-palworld_save_tools
+psp_data_cache
+temp.json
+pals/error_*.json

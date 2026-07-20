@@ -122,11 +122,12 @@ import traceback
 
 
 class PalEditConfig:
-    version = "0.12.1"
+    version = "0.13.0 (Palworld 1.0)"
     ftsize = 18
     font = "Microsoft YaHei"
-    skill_col = ["#DE3C3A", "#DE3C3A", "#DE3C3A", "#000000", "#DFE8E7", "#DFE8E7", "#FEDE00", "#68FFD8"]
-    levelcap = 65
+    # index = rating + 3; Palworld 1.0 adds rating-5 passives (last entry)
+    skill_col = ["#DE3C3A", "#DE3C3A", "#DE3C3A", "#000000", "#DFE8E7", "#DFE8E7", "#FEDE00", "#68FFD8", "#C77DFF"]
+    levelcap = 80
 
 
 class PalEdit():
@@ -665,7 +666,9 @@ class PalEdit():
         self.skilllabel.config(text=self.i18n['msg_saving'])
 
         file = askopenfilename(initialdir=os.path.expanduser('~') + "\\AppData\\Local\\Pal\\Saved\\SaveGames",
-                               filetypes=[("Level.sav", "Level.sav")])
+                               filetypes=[("Palworld saves", ("Level.sav", "GlobalPalStorage.sav")),
+                                          ("Level.sav", "Level.sav"),
+                                          ("GlobalPalStorage.sav", "GlobalPalStorage.sav")])
         logger.info(f"Opening file {file}")
 
         if file:
@@ -674,7 +677,7 @@ class PalEdit():
             self.skilllabel.config(text=self.i18n['msg_decompressing'])
             with open(file, "rb") as f:
                 data = f.read()
-                raw_gvas, _ = decompress_sav_to_gvas(data)
+                raw_gvas, self.save_type = decompress_sav_to_gvas(data)
             self.skilllabel.config(text=self.i18n['msg_loading'])
             
             try:
@@ -714,20 +717,46 @@ class PalEdit():
                 'gvas_file': data,
                 'properties': data.properties
             }
-        paldata = self.data['properties']['worldSaveData']['value']['CharacterSaveParameterMap']['value']
-        self.palguidmanager = PalInfo.PalGuid(self.data)
+        props = self.data['properties']
+        if 'SaveParameterArray' in props:
+            # Palworld 1.0 GlobalPalStorage.sav: a flat array of 960 slots,
+            # empty ones marked with CharacterID "None". Wrap each occupied
+            # slot in the Level.sav entry shape so PalEntity edits the same
+            # underlying dicts by reference.
+            self.storage_mode = True
+            self.palguidmanager = None
+            paldata = []
+            for entry in props['SaveParameterArray']['value']['values']:
+                sp = entry['SaveParameter']
+                if sp['value'].get('CharacterID', {}).get('value', 'None') in ('None', ''):
+                    continue
+                paldata.append({
+                    'key': {'InstanceId': entry['InstanceId']['value']['InstanceId']},
+                    'value': {'RawData': {'value': {'object': {'SaveParameter': sp}}}},
+                })
+        else:
+            self.storage_mode = False
+            paldata = props['worldSaveData']['value']['CharacterSaveParameterMap']['value']
+            self.palguidmanager = PalInfo.PalGuid(self.data)
         self.loadpal(paldata)
 
     def loadpal(self, paldata):
         logger.Space()
         self.palbox = []
         self.players = {}
-        self.players = self.palguidmanager.GetPlayerslist()
-        print(self.players)
-        for p in self.players:
-            playerguid = self.players[p]
-            playersav = os.path.dirname(self.filename) + f"/Players/{str(playerguid).upper().replace('-', '')}.sav"
-            self.players[p] = PalInfo.PalPlayerEntity(palworld_pal_edit.SaveConverter.convert_sav_to_obj(playersav))
+        if self.palguidmanager is None:
+            self.players = {"Global Palbox": PalInfo.PalStoragePlayer()}
+        else:
+            self.players = self.palguidmanager.GetPlayerslist()
+            print(self.players)
+            for p in list(self.players):
+                playerguid = self.players[p]
+                playersav = os.path.dirname(self.filename) + f"/Players/{str(playerguid).upper().replace('-', '')}.sav"
+                try:
+                    self.players[p] = PalInfo.PalPlayerEntity(palworld_pal_edit.SaveConverter.convert_sav_to_obj(playersav))
+                except Exception:
+                    logger.error(f"Could not load player save {playersav}", exc_info=True)
+                    self.players[p] = PalInfo.PalStoragePlayer(playerguid)
         self.containers = {}
         nullmoves = []
 
@@ -858,13 +887,18 @@ class PalEdit():
             try:
                 if 'gvas_file' in self.data:
                     gvas_file = self.data['gvas_file']
-                    if (
-                            "Pal.PalWorldSaveGame" in gvas_file.header.save_game_class_name
-                            or "Pal.PalLocalWorldSaveGame" in gvas_file.header.save_game_class_name
-                    ):
-                        save_type = 0x32
-                    else:
-                        save_type = 0x31
+                    # Reuse the compression type the file was loaded with
+                    # (0x31 Oodle for Palworld 1.0 saves, 0x32 zlib for older
+                    # world saves) so the round-trip preserves the format.
+                    save_type = getattr(self, 'save_type', None)
+                    if save_type is None:
+                        if (
+                                "Pal.PalWorldSaveGame" in gvas_file.header.save_game_class_name
+                                or "Pal.PalLocalWorldSaveGame" in gvas_file.header.save_game_class_name
+                        ):
+                            save_type = 0x32
+                        else:
+                            save_type = 0x31
                     sav_file = compress_gvas_to_sav(
                         gvas_file.write(PALEDIT_PALWORLD_CUSTOM_PROPERTIES), save_type
                     )
@@ -892,8 +926,12 @@ class PalEdit():
     def savepson(self, filename):
         f = open(filename, "w", encoding="utf8")
         if 'properties' in self.data:
-            json.dump(self.data['properties']['worldSaveData']['value']['CharacterSaveParameterMap']['value'],
-                      f)  # , indent=4)
+            if getattr(self, 'storage_mode', False):
+                json.dump(self.data['properties']['SaveParameterArray']['value']['values'],
+                          f, cls=UUIDEncoder)
+            else:
+                json.dump(self.data['properties']['worldSaveData']['value']['CharacterSaveParameterMap']['value'],
+                          f)  # , indent=4)
         else:
             json.dump(self.data, f)  # , indent=4)
         f.close()
@@ -961,8 +999,11 @@ Do you want to use %s's DEFAULT Scaling (%s)?
                 return True
             return False
 
-        filtered = filter(GetMyPals, self.palbox)
-        filterlist = list(filtered)
+        if getattr(self, 'storage_mode', False):
+            filterlist = list(self.palbox)
+        else:
+            filtered = filter(GetMyPals, self.palbox)
+            filterlist = list(filtered)
 
         filterlist.sort(key=lambda e: e.GetName())
         

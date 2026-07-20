@@ -11,7 +11,8 @@
         "EPalWazaID::PowerShot": 22,
         "EPalWazaID::WindCutter": 30,
         "EPalWazaID::SeedMachinegun": 40,
-        "EPalWazaID::HyperBeam": 50
+        "EPalWazaID::HyperBeam": 50,
+        "EPalWazaID::HolyBlast": 70
     },
     "RaidMoveset": {},
     "Scaling": {

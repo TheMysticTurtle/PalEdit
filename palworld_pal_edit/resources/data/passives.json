@@ -219,10 +219,10 @@
         "Rating": "4"
     },
     "Stamina_Up_1": {
-        "Rating": "1"
+        "Rating": "3"
     },
     "Stamina_Up_2": {
-        "Rating": "3"
+        "Rating": "1"
     },
     "Stamina_Up_3": {
         "Rating": "4"
@@ -231,10 +231,10 @@
         "Rating": "-1"
     },
     "SalePrice_Up_1": {
-        "Rating": "1"
+        "Rating": "3"
     },
     "SalePrice_Up_2": {
-        "Rating": "3"
+        "Rating": "1"
     },
     "SalePrice_Down_1": {
         "Rating": "-1"
@@ -257,10 +257,10 @@
     "Vampire": {
         "Rating": "4"
     },
-    "Alien" : {
+    "Alien": {
         "Rating": "1"
     },
-    "EternalFlame" : {
+    "EternalFlame": {
         "Rating": "4"
     },
     "Invader": {
@@ -303,6 +303,966 @@
         "Rating": "3"
     },
     "Salvation": {
+        "Rating": "4"
+    },
+    "AirDash_1": {
+        "Rating": "1"
+    },
+    "AirDash_2": {
+        "Rating": "1"
+    },
+    "AirDash_3": {
+        "Rating": "1"
+    },
+    "AirDash_4": {
+        "Rating": "1"
+    },
+    "Attack_ACC_up1": {
+        "Rating": "1"
+    },
+    "Attack_ACC_up1_Armor": {
+        "Rating": "1"
+    },
+    "Attack_ACC_up1_Otomo_Only_Equip": {
+        "Rating": "1"
+    },
+    "Attack_ACC_up2": {
+        "Rating": "2"
+    },
+    "Attack_ACC_up2_Armor": {
+        "Rating": "2"
+    },
+    "Attack_ACC_up2_Otomo_Only_Equip": {
+        "Rating": "2"
+    },
+    "Attack_ACC_up3": {
+        "Rating": "3"
+    },
+    "Attack_ACC_up3_Armor": {
+        "Rating": "3"
+    },
+    "Attack_ACC_up3_Otomo_Only_Equip": {
+        "Rating": "3"
+    },
+    "Attack_ACC_up4": {
+        "Rating": "4"
+    },
+    "Attack_ACC_up4_Armor": {
+        "Rating": "4"
+    },
+    "Attack_ACC_up4_Otomo_Only_Equip": {
+        "Rating": "4"
+    },
+    "AutoHPRegeneRate_Passive": {
+        "Rating": "3"
+    },
+    "AvoidDurationUp_EquipSkill_2": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_AmaterasuWolf_Dark": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_Anubis": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_BadCatgirl": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_BerryGoat_Dark": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_BlackMetalDragon": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_BlackPuppy": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_BlueDragon": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_BlueThunderHorse": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_BlueberryFairy": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_CactusDoll": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_CaptainPenguin": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_CatMage": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_CatVampire": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_CubeTurtle": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_CubeTurtle_Neutral": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_DarkScorpion": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_DarkScorpion_Ground": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_DomeArmorDragon": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_ElecLizard": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_ElecPanda": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_ElecSnail": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_FairyDragon": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_FengyunDeeper": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_FengyunDeeper_Electric": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_FireKirin": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_FlameBuffalo": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_FlowerDinosaur_Electric": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_FlowerDoll": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_FoxExorcist": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_FoxMage": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_GhostDragon": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_GhostRabbit": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_GoldenHorse": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_GrassGolem": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_GrassGolem_Dark": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_GrassMammoth": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_GrassPanda_Electric": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_GrassRabbitMan": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_GrimGirl": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_HawkBird": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_HerculesBeetle": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_HerculesBeetle_Ground": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_Horus_Water": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_IceFox": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_IceHorse": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_IceHorse_Dark": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_IceNarwhal": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_IceNarwhal_Fire": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_JetDragon": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_KabukiMan": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_KingAlpaca": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_KingAlpaca_Ice": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_KingBahamut": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_Kirin": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_Kitsunebi_Ice": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_LazyCatfish": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_LazyDragon_Electric": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_LilyQueen": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_LilyQueen_Dark": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_LotusDragon": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_Manticore": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_MoonChild": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_MopKing": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_MushroomLady": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_Mutant": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_MysteryMask": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_NaughtyCat": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_NightBlueHorse": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_PinkRabbit_Grass": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_PlantSlime": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_PoseidonOrca": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_PurpleSpider": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_QueenBee": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_RaijinDaughter_Water": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_RockBeast": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_RockBeast_Ice": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_Ronin": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_SaintCentaur_1": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_SaintCentaur_2": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_SakuraSaurus": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_SakuraSaurus_Water": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_ScorpionMan_Electric": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_SkyDragon": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_Suzaku": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_ThunderBird": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_ThunderFluffyBird": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_Umihebi": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_VioletFairy": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_VolcanicMonster": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_VolcanoDragon": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_VolcanoDragon_Ice": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_WeaselDragon": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_Werewolf_Ice": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_WhiteDeer": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_WhiteDeer_Dark": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_WhiteMoth": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_WhiteShieldDragon": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_WhiteTiger_Ground": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_WingGolem": {
+        "Rating": "1"
+    },
+    "BossDefeatReward_Yeti_Grass": {
+        "Rating": "1"
+    },
+    "CaptureLevel_Up_1": {
+        "Rating": "1"
+    },
+    "CaptureLevel_Up_2": {
+        "Rating": "1"
+    },
+    "CaptureLevel_Up_3": {
+        "Rating": "1"
+    },
+    "CaptureLevel_Up_4": {
+        "Rating": "1"
+    },
+    "CaptureLevel_Up_5": {
+        "Rating": "1"
+    },
+    "CaptureLevel_Up_6": {
+        "Rating": "1"
+    },
+    "CollectItem_Berries": {
+        "Rating": "1"
+    },
+    "CollectItem_Egg": {
+        "Rating": "1"
+    },
+    "CollectItem_Milk": {
+        "Rating": "1"
+    },
+    "CollectItem_Money": {
+        "Rating": "1"
+    },
+    "CollectItem_Sweets": {
+        "Rating": "1"
+    },
+    "CollectItem_Wool_Alpaca": {
+        "Rating": "1"
+    },
+    "CollectItem_Wool_SheepBall": {
+        "Rating": "1"
+    },
+    "CollectItem_Wool_WhiteMoth": {
+        "Rating": "1"
+    },
+    "CoolTimeReduction_Up_3": {
+        "Rating": "4"
+    },
+    "Defense_ACC_up1_Otomo_Only_Equip": {
+        "Rating": "1"
+    },
+    "Defense_ACC_up2_Otomo_Only_Equip": {
+        "Rating": "2"
+    },
+    "Defense_ACC_up3_Otomo_Only_Equip": {
+        "Rating": "3"
+    },
+    "Defense_ACC_up4_Otomo_Only_Equip": {
+        "Rating": "4"
+    },
+    "Deffence_up2_2": {
+        "Rating": "2"
+    },
+    "Defuser_ExplosiveSpore_EquipSkill": {
+        "Rating": "1"
+    },
+    "ElementBoost_Dark_1_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Dark_1_Otomo_Only_Equip": {
+        "Rating": "1"
+    },
+    "ElementBoost_Dark_2_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Dark_2_Otomo_Only_Equip": {
+        "Rating": "2"
+    },
+    "ElementBoost_Dark_3_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Dark_3_Otomo_Only_Equip": {
+        "Rating": "3"
+    },
+    "ElementBoost_Dark_4_Otomo_Only_Equip": {
+        "Rating": "4"
+    },
+    "ElementBoost_Dragon_1_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Dragon_1_Otomo_Only_Equip": {
+        "Rating": "1"
+    },
+    "ElementBoost_Dragon_2_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Dragon_2_Otomo_Only_Equip": {
+        "Rating": "2"
+    },
+    "ElementBoost_Dragon_3_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Dragon_3_Otomo_Only_Equip": {
+        "Rating": "3"
+    },
+    "ElementBoost_Dragon_4_Otomo_Only_Equip": {
+        "Rating": "4"
+    },
+    "ElementBoost_Earth_1_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Earth_1_Otomo_Only_Equip": {
+        "Rating": "1"
+    },
+    "ElementBoost_Earth_2_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Earth_2_Otomo_Only_Equip": {
+        "Rating": "2"
+    },
+    "ElementBoost_Earth_3_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Earth_3_Otomo_Only_Equip": {
+        "Rating": "3"
+    },
+    "ElementBoost_Earth_4_Otomo_Only_Equip": {
+        "Rating": "4"
+    },
+    "ElementBoost_Electricity_1_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Electricity_1_Otomo_Only_Equip": {
+        "Rating": "1"
+    },
+    "ElementBoost_Electricity_2_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Electricity_2_Otomo_Only_Equip": {
+        "Rating": "2"
+    },
+    "ElementBoost_Electricity_3_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Electricity_3_Otomo_Only_Equip": {
+        "Rating": "3"
+    },
+    "ElementBoost_Electricity_4_Otomo_Only_Equip": {
+        "Rating": "4"
+    },
+    "ElementBoost_Fire_1_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Fire_1_Otomo_Only_Equip": {
+        "Rating": "1"
+    },
+    "ElementBoost_Fire_2_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Fire_2_Otomo_Only_Equip": {
+        "Rating": "2"
+    },
+    "ElementBoost_Fire_3_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Fire_3_Otomo_Only_Equip": {
+        "Rating": "3"
+    },
+    "ElementBoost_Fire_4_Otomo_Only_Equip": {
+        "Rating": "4"
+    },
+    "ElementBoost_Ice_1_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Ice_1_Otomo_Only_Equip": {
+        "Rating": "1"
+    },
+    "ElementBoost_Ice_2_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Ice_2_Otomo_Only_Equip": {
+        "Rating": "2"
+    },
+    "ElementBoost_Ice_3_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Ice_3_Otomo_Only_Equip": {
+        "Rating": "3"
+    },
+    "ElementBoost_Ice_4_Otomo_Only_Equip": {
+        "Rating": "4"
+    },
+    "ElementBoost_Leaf_1_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Leaf_1_Otomo_Only_Equip": {
+        "Rating": "1"
+    },
+    "ElementBoost_Leaf_2_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Leaf_2_Otomo_Only_Equip": {
+        "Rating": "2"
+    },
+    "ElementBoost_Leaf_3_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Leaf_3_Otomo_Only_Equip": {
+        "Rating": "3"
+    },
+    "ElementBoost_Leaf_4_Otomo_Only_Equip": {
+        "Rating": "4"
+    },
+    "ElementBoost_Normal_1_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Normal_1_Otomo_Only_Equip": {
+        "Rating": "1"
+    },
+    "ElementBoost_Normal_2_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Normal_2_Otomo_Only_Equip": {
+        "Rating": "2"
+    },
+    "ElementBoost_Normal_3_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Normal_3_Otomo_Only_Equip": {
+        "Rating": "3"
+    },
+    "ElementBoost_Normal_4_Otomo_Only_Equip": {
+        "Rating": "4"
+    },
+    "ElementBoost_Water_1_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Water_1_Otomo_Only_Equip": {
+        "Rating": "1"
+    },
+    "ElementBoost_Water_2_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Water_2_Otomo_Only_Equip": {
+        "Rating": "2"
+    },
+    "ElementBoost_Water_3_BossDefeat": {
+        "Rating": "1"
+    },
+    "ElementBoost_Water_3_Otomo_Only_Equip": {
+        "Rating": "3"
+    },
+    "ElementBoost_Water_4_Otomo_Only_Equip": {
+        "Rating": "4"
+    },
+    "ElementResist_Aqua_1": {
+        "Rating": "1"
+    },
+    "ElementResist_Aqua_2": {
+        "Rating": "2"
+    },
+    "ElementResist_Aqua_3": {
+        "Rating": "3"
+    },
+    "ElementResist_Aqua_4": {
+        "Rating": "4"
+    },
+    "ElementResist_Dark_1": {
+        "Rating": "1"
+    },
+    "ElementResist_Dark_2": {
+        "Rating": "2"
+    },
+    "ElementResist_Dark_3": {
+        "Rating": "3"
+    },
+    "ElementResist_Dark_4": {
+        "Rating": "4"
+    },
+    "ElementResist_Dragon_1": {
+        "Rating": "1"
+    },
+    "ElementResist_Dragon_2": {
+        "Rating": "2"
+    },
+    "ElementResist_Dragon_3": {
+        "Rating": "3"
+    },
+    "ElementResist_Dragon_4": {
+        "Rating": "4"
+    },
+    "ElementResist_Earth_1": {
+        "Rating": "1"
+    },
+    "ElementResist_Earth_2": {
+        "Rating": "2"
+    },
+    "ElementResist_Earth_3": {
+        "Rating": "3"
+    },
+    "ElementResist_Earth_4": {
+        "Rating": "4"
+    },
+    "ElementResist_Fire_1": {
+        "Rating": "1"
+    },
+    "ElementResist_Fire_2": {
+        "Rating": "2"
+    },
+    "ElementResist_Fire_3": {
+        "Rating": "3"
+    },
+    "ElementResist_Fire_4": {
+        "Rating": "4"
+    },
+    "ElementResist_Ice_1": {
+        "Rating": "1"
+    },
+    "ElementResist_Ice_2": {
+        "Rating": "2"
+    },
+    "ElementResist_Ice_3": {
+        "Rating": "3"
+    },
+    "ElementResist_Ice_4": {
+        "Rating": "4"
+    },
+    "ElementResist_Leaf_1": {
+        "Rating": "1"
+    },
+    "ElementResist_Leaf_2": {
+        "Rating": "2"
+    },
+    "ElementResist_Leaf_3": {
+        "Rating": "3"
+    },
+    "ElementResist_Leaf_4": {
+        "Rating": "4"
+    },
+    "ElementResist_Normal_1": {
+        "Rating": "1"
+    },
+    "ElementResist_Normal_2": {
+        "Rating": "2"
+    },
+    "ElementResist_Normal_3": {
+        "Rating": "3"
+    },
+    "ElementResist_Normal_4": {
+        "Rating": "4"
+    },
+    "ElementResist_Thunder_1": {
+        "Rating": "1"
+    },
+    "ElementResist_Thunder_2": {
+        "Rating": "2"
+    },
+    "ElementResist_Thunder_3": {
+        "Rating": "3"
+    },
+    "ElementResist_Thunder_4": {
+        "Rating": "4"
+    },
+    "FriendshipPoint_Increase_EquipSkill": {
+        "Rating": "-1"
+    },
+    "HP_ACC_up1": {
+        "Rating": "1"
+    },
+    "HP_ACC_up2": {
+        "Rating": "2"
+    },
+    "HP_ACC_up3": {
+        "Rating": "3"
+    },
+    "HP_ACC_up4": {
+        "Rating": "4"
+    },
+    "Invalid_ToxicGas_EquipSkill": {
+        "Rating": "1"
+    },
+    "JumpCount_Increase1": {
+        "Rating": "1"
+    },
+    "JumpCount_Increase2": {
+        "Rating": "1"
+    },
+    "JumpCount_Increase3": {
+        "Rating": "1"
+    },
+    "JumpPower_Increase": {
+        "Rating": "1"
+    },
+    "MaxInventoryWeight_up": {
+        "Rating": "1"
+    },
+    "MaxInventoryWeight_up2": {
+        "Rating": "1"
+    },
+    "MaxInventoryWeight_up3": {
+        "Rating": "3"
+    },
+    "MaxInventoryWeight_up_Equip_1": {
+        "Rating": "-1"
+    },
+    "MaxInventoryWeight_up_Equip_2": {
+        "Rating": "-1"
+    },
+    "MaxInventoryWeight_up_Equip_3": {
+        "Rating": "-1"
+    },
+    "MaxInventoryWeight_up_Equip_4": {
+        "Rating": "-1"
+    },
+    "MiniNushi": {
+        "Rating": "3"
+    },
+    "MutationPal_Babysitter": {
+        "Rating": "4"
+    },
+    "MutationPal_ExplosionResist": {
+        "Rating": "4"
+    },
+    "MutationPal_Immortal": {
+        "Rating": "4"
+    },
+    "MutationPal_Mutant": {
+        "Rating": "4"
+    },
+    "NightOwl": {
+        "Rating": "-1"
+    },
+    "OctaviaArmorVampire": {
+        "Rating": "4"
+    },
+    "PalExp_Increase_1_Otomo_Only_Equip": {
+        "Rating": "1"
+    },
+    "PalExp_Increase_2_Otomo_Only_Equip": {
+        "Rating": "2"
+    },
+    "PalExp_Increase_3_Otomo_Only_Equip": {
+        "Rating": "3"
+    },
+    "PlayerSP_DecreaseRate_Passive": {
+        "Rating": "3"
+    },
+    "ReloadSpeedUp_Passive": {
+        "Rating": "3"
+    },
+    "RideJumpCount_Increase1": {
+        "Rating": "4"
+    },
+    "RideJumpCount_Increase2": {
+        "Rating": "4"
+    },
+    "SelfDeathAddItemDrop_up_1": {
+        "Rating": "1"
+    },
+    "SelfDeathAddItemDrop_up_2": {
+        "Rating": "3"
+    },
+    "SelfDeathAddItemDrop_up_3": {
+        "Rating": "4"
+    },
+    "SphereModule_Curve": {
+        "Rating": "1"
+    },
+    "SphereModule_Curve2": {
+        "Rating": "1"
+    },
+    "SphereModule_Heavy": {
+        "Rating": "1"
+    },
+    "SphereModule_Homing": {
+        "Rating": "1"
+    },
+    "SphereModule_Sniper": {
+        "Rating": "1"
+    },
+    "SphereModule_Sniper2": {
+        "Rating": "1"
+    },
+    "StonDrop_Boost_1": {
+        "Rating": "1"
+    },
+    "StonDrop_Boost_2": {
+        "Rating": "1"
+    },
+    "StonDrop_Boost_3": {
+        "Rating": "3"
+    },
+    "StonDrop_Boost_4": {
+        "Rating": "3"
+    },
+    "StonDrop_Boost_5": {
+        "Rating": "4"
+    },
+    "StonWoodDrop_Boost": {
+        "Rating": "3"
+    },
+    "TemperatureResist_Cold1": {
+        "Rating": "1"
+    },
+    "TemperatureResist_Cold2": {
+        "Rating": "2"
+    },
+    "TemperatureResist_Cold3": {
+        "Rating": "3"
+    },
+    "TemperatureResist_Heat1": {
+        "Rating": "1"
+    },
+    "TemperatureResist_Heat1Cold1": {
+        "Rating": "1"
+    },
+    "TemperatureResist_Heat2": {
+        "Rating": "2"
+    },
+    "TemperatureResist_Heat2Cold2": {
+        "Rating": "2"
+    },
+    "TemperatureResist_Heat3": {
+        "Rating": "3"
+    },
+    "TemperatureResist_Heat3Cold3": {
+        "Rating": "3"
+    },
+    "WoodDrop_Boost_1": {
+        "Rating": "1"
+    },
+    "WoodDrop_Boost_2": {
+        "Rating": "1"
+    },
+    "WoodDrop_Boost_3": {
+        "Rating": "3"
+    },
+    "WoodDrop_Boost_4": {
+        "Rating": "3"
+    },
+    "WoodDrop_Boost_5": {
+        "Rating": "4"
+    },
+    "WorkSpeed_ACC_up1": {
+        "Rating": "1"
+    },
+    "WorkSpeed_ACC_up2": {
+        "Rating": "2"
+    },
+    "WorkSpeed_ACC_up3": {
+        "Rating": "3"
+    },
+    "WorkSpeed_ACC_up4": {
+        "Rating": "4"
+    },
+    "WorkSuitabilityAddRank_MonsterFarm_1": {
+        "Rating": "3"
+    },
+    "WorkSuitabilityAddRank_MonsterFarm_2": {
+        "Rating": "4"
+    },
+    "WorldTree_ATK": {
+        "Rating": "5"
+    },
+    "WorldTree_ATK_DEF": {
+        "Rating": "5"
+    },
+    "WorldTree_CraftSpeed": {
+        "Rating": "5"
+    },
+    "WorldTree_DEF": {
+        "Rating": "5"
+    },
+    "WorldTree_FullStomach": {
+        "Rating": "5"
+    },
+    "WorldTree_MoveSpeed": {
+        "Rating": "5"
+    },
+    "WorldTree_Sanity": {
+        "Rating": "5"
+    },
+    "YakushimaDagameBoost_Magic_Equip": {
+        "Rating": "-1"
+    },
+    "YakushimaDagameBoost_Melee_Equip": {
+        "Rating": "-1"
+    },
+    "YakushimaDagameBoost_Ranged_Equip": {
+        "Rating": "-1"
+    },
+    "YakushimaDagameBoost_Summon_Equip": {
+        "Rating": "-1"
+    },
+    "YakushimaProtection_Equip": {
+        "Rating": "-1"
+    },
+    "defense_ACC_up1": {
+        "Rating": "1"
+    },
+    "defense_ACC_up2": {
+        "Rating": "2"
+    },
+    "defense_ACC_up3": {
+        "Rating": "3"
+    },
+    "defense_ACC_up4": {
         "Rating": "4"
     }
 }

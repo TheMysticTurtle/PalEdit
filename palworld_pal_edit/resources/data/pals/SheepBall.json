@@ -1,5 +1,5 @@
 {
-    "CodeName": "SheepBall",
+    "CodeName": "Sheepball",
     "Type": [
         "Normal",
         "None"
@@ -11,7 +11,8 @@
         "EPalWazaID::SelfDestruct": 22,
         "EPalWazaID::ThunderBall": 30,
         "EPalWazaID::PowerBall": 40,
-        "EPalWazaID::HyperBeam": 50
+        "EPalWazaID::HyperBeam": 50,
+        "EPalWazaID::HolyBlast": 70
     },
     "RaidMoveset": {},
     "Scaling": {

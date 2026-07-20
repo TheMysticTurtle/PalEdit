@@ -205,7 +205,9 @@ class PalEntity:
         if "SlotId" in self._obj:
             self.owner = self._obj["SlotId"]['value']["ContainerId"]['value']['ID']['value']
 
-        if "IsPlayer" in self._obj:
+        # Palworld 1.0 writes IsPlayer=False on every pal, so key presence
+        # alone no longer identifies a player character
+        if "IsPlayer" in self._obj and self._obj["IsPlayer"].get("value", False):
             raise Exception("This is a player character")
 
         if not "IsRarePal" in self._obj:
@@ -983,6 +985,23 @@ class PalPlayerEntity:
 
     def dump(self):
         return self._data
+
+
+class PalStoragePlayer:
+    """Pseudo-player used when editing GlobalPalStorage.sav (Palworld 1.0
+    Global Palbox), which has no player or container data."""
+
+    def __init__(self, guid="00000000-0000-0000-0000-000000000000"):
+        self._guid = guid
+
+    def GetPlayerGuid(self):
+        return self._guid
+
+    def GetTravelPalInventoryGuid(self):
+        return None
+
+    def GetPalStorageGuid(self):
+        return None
 
 
 with open("%s/resources/data/elements.json" % (module_dir), "r", encoding="utf8") as elementfile:

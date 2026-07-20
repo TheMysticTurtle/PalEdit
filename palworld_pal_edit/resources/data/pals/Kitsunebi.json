@@ -11,12 +11,13 @@
         "EPalWazaID::FlareArrow": 22,
         "EPalWazaID::Flamethrower": 30,
         "EPalWazaID::GhostFlame": 40,
-        "EPalWazaID::FireBall": 50
+        "EPalWazaID::FireBall": 50,
+        "EPalWazaID::DragonMeteor": 70
     },
     "RaidMoveset": {},
     "Scaling": {
         "HP": 65,
-        "PHY": 70,
+        "PHY": 75,
         "MAG": 75,
         "DEF": 70
     },

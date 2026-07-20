@@ -1,6 +1,6 @@
 {
     "CodeName": "EPalWazaID::Unique_ElecPanda_ElecScratch",
     "Type": "Electricity",
-    "Power": 90,
+    "Power": 150,
     "Category": "Melee"
 }

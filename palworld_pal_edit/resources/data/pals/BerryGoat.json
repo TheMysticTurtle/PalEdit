@@ -11,7 +11,8 @@
         "EPalWazaID::PowerShot": 22,
         "EPalWazaID::GrassTornado": 30,
         "EPalWazaID::RootAttack": 40,
-        "EPalWazaID::SolarBeam": 50
+        "EPalWazaID::SolarBeam": 50,
+        "EPalWazaID::WindBurst": 70
     },
     "RaidMoveset": {},
     "Scaling": {
