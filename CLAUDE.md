@@ -129,6 +129,25 @@ needs a stub logger.
   `event_generate("<Return>")` is flaky without real focus — test via the
   direct code paths (`changeskill(n, code)`, `attacks[n].set + changeattack`).
 
+## Owner feedback round 2 (2026-07-20, IN PROGRESS this session)
+
+1. Attack picker: **toggle between "standard" (learnset-only) and
+   "fruit-teachable"** — checkbutton inside the picker popup; the skill-fruit
+   combobox always uses the fruit-teachable set.
+2. **Species browser popup** (like the in-game search): filter by element
+   type and work suitability + name search, rows show the pal's ICON next to
+   its name (ttk.Treeview with thumbnail images, subsample cached). Only
+   catchable pals (psp pal_deck_index >= 0 → emit "DeckIndex" in per-pal
+   files) + tower bosses ("TowerBoss" from is_tower_boss). Open via 🔍 button
+   next to the species combobox; selecting applies via the same
+   changespeciestype path.
+3. **"Add to Global" / working clone in palbox mode**: clonepal is guarded
+   off in storage_mode. Implement: find first SaveParameterArray slot with
+   CharacterID "None", deepcopy the selected pal's SaveParameter into it,
+   PRESERVE the empty slot's original SlotId (else two pals share a slot),
+   new InstanceId GUID, then loaddata(self.data) to refresh. "Add random
+   creature" = clone + change species afterwards.
+
 ## Owner feedback 2026-07-20 (TODO next session — verbatim requests)
 
 1. **Attacks**: "abilities still aren't filtered down to what that pal can
