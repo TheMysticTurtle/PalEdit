@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_MysteryMask_LifeSteal",
     "Type": "Dark",
     "Power": 400,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "MysteryMask",
+        "PREDATOR_MysteryMask"
+    ]
 }

@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_IceDeer_IceHorn",
     "Type": "Ice",
     "Power": 120,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "IceDeer"
+    ]
 }

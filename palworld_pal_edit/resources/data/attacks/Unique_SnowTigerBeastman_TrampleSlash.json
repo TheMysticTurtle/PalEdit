@@ -2,5 +2,10 @@
     "CodeName": "EPalWazaID::Unique_SnowTigerBeastman_TrampleSlash",
     "Type": "Ice",
     "Power": 300,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "GYM_SnowTigerBeastman",
+        "GYM_SnowTigerBeastman_2",
+        "SnowTigerBeastman"
+    ]
 }

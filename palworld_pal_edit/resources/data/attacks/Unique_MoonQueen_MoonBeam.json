@@ -2,5 +2,10 @@
     "CodeName": "EPalWazaID::Unique_MoonQueen_MoonBeam",
     "Type": "Normal",
     "Power": 600,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "GYM_MoonQueen",
+        "GYM_MoonQueen_2",
+        "MoonQueen"
+    ]
 }

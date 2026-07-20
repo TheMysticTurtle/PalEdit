@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_SakuraSaurus_SideTackle",
     "Type": "Leaf",
     "Power": 120,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "SakuraSaurus",
+        "SakuraSaurus_Water"
+    ]
 }

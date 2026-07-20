@@ -442,14 +442,20 @@ class PalEdit():
         self.handleMaxHealthUpdates(pal)
         self.refresh(i)
 
-    def changeskill(self, num):
+    def changeskill(self, num, code=None):
         if not self.isPalSelected():
             return
         i = int(self.listdisplay.curselection()[0])
         pal = self.FilteredPals()[i]
 
-        index = list(PalInfo.PalPassives.values()).index(self.skills_name[num].get())
-        self.skills[num].set(list(PalInfo.PalPassives.keys())[index])
+        if code is not None:
+            # exact code from the search picker — avoids ambiguity when two
+            # passives share a localized name
+            self.skills[num].set(code)
+            self.skills_name[num].set(PalInfo.PalPassives.get(code, code))
+        else:
+            index = list(PalInfo.PalPassives.values()).index(self.skills_name[num].get())
+            self.skills[num].set(list(PalInfo.PalPassives.keys())[index])
         if not self.skills[num].get() in ["Unknown", "UNKNOWN"]:
             if self.skills[num].get() in ["None", "NONE"]:
                 pal.RemoveSkill(num)
@@ -457,6 +463,115 @@ class PalEdit():
                 pal.SetSkill(num, self.skills[num].get())
 
         self.refresh(i)
+
+    def availableAttacks(self, pal):
+        """Attack codes offered for this pal, honouring the legal-only toggle."""
+        if getattr(self, 'filterlegal', None) is None or self.filterlegal.get():
+            return pal.GetAvailableSkills()
+        codes = [c for c in PalInfo.PalAttacks if c not in ("", "None", "EPalWazaID::None")]
+        codes.sort(key=lambda c: PalInfo.PalAttacks[c])
+        return codes
+
+    def availablePassives(self, pal):
+        """Passive codes offered for this pal, honouring the legal-only
+        toggle; always includes whatever is currently equipped."""
+        if getattr(self, 'filterlegal', None) is None or self.filterlegal.get():
+            codes = PalInfo.GetLegalPassives(pal.GetCodeName())
+        else:
+            codes = [c for c in PalInfo.PalPassives
+                     if c not in ("NONE", "UNKNOWN", "None", "Unknown")]
+        for c in pal.GetSkills():
+            if c in PalInfo.PalPassives and c not in codes and c.lower() not in ("none", "unknown"):
+                codes.append(c)
+        return codes
+
+    def open_ability_search(self, kind, num):
+        """Searchable picker used by the passive and equipped-attack slots."""
+        if not self.isPalSelected():
+            return "break"
+        i = int(self.listdisplay.curselection()[0])
+        pal = self.FilteredPals()[i]
+
+        # rows of (display, code); display carries rating/power so duplicate
+        # localized names (e.g. two passives both called "Swift") stay distinct
+        if kind == "passive":
+            rows = [(f"{PalInfo.PalPassives[c]}  [{int(PalInfo.PassiveRating.get(c, '0')):+d}]", c)
+                    for c in self.availablePassives(pal)]
+            anchor = self.skilldrops[num]
+        else:
+            rows = [(f"{PalInfo.PalAttacks[c]}  ({PalInfo.AttackPower.get(c, '?')})", c)
+                    for c in self.availableAttacks(pal)]
+            anchor = self.attackdrops[num]
+        rows.sort(key=lambda r: r[0].lower())
+        rows.insert(0, ("None", "None"))
+
+        top = tk.Toplevel(self.gui)
+        top.title(self.i18n.get('search_title', "Search..."))
+        top.transient(self.gui)
+        x, y = anchor.winfo_rootx(), anchor.winfo_rooty() + anchor.winfo_height()
+        top.geometry(f"340x400+{x}+{y}")
+
+        query = tk.StringVar()
+        entry = tk.Entry(top, textvariable=query, font=(PalEditConfig.font, PalEditConfig.ftsize))
+        entry.pack(fill=tk.constants.X, padx=4, pady=4)
+
+        frame = tk.Frame(top)
+        frame.pack(expand=True, fill=tk.constants.BOTH, padx=4, pady=(0, 4))
+        sb = tk.Scrollbar(frame)
+        sb.pack(side=tk.constants.RIGHT, fill=tk.constants.Y)
+        lb = tk.Listbox(frame, yscrollcommand=sb.set, font=(PalEditConfig.font, PalEditConfig.ftsize - 2))
+        lb.pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.BOTH)
+        sb.config(command=lb.yview)
+
+        visible = []
+
+        def refill(*_):
+            txt = query.get().lower()
+            lb.delete(0, tk.constants.END)
+            visible.clear()
+            for display, code in rows:
+                if txt in display.lower():
+                    visible.append(code)
+                    lb.insert(tk.constants.END, display)
+                    if kind == "passive" and code != "None":
+                        col = PalEditConfig.skill_col[int(PalInfo.PassiveRating.get(code, "0")) + 3]
+                        if col not in ("#DFE8E7", "#000000"):
+                            lb.itemconfig(tk.constants.END, {'fg': PalEdit.mean_color(col, "000000")})
+            if lb.size() > 0:
+                lb.selection_set(0)
+
+        def choose(*_):
+            sel = lb.curselection()
+            if not sel:
+                return
+            code = visible[sel[0]]
+            top.destroy()
+            if kind == "passive":
+                self.changeskill(num, code)
+            else:
+                self.attacks[num].set(code)
+                self.changeattack(num)
+
+        def move(delta):
+            if lb.size() == 0:
+                return
+            cur = lb.curselection()
+            idx = max(0, min(lb.size() - 1, (cur[0] if cur else 0) + delta))
+            lb.selection_clear(0, tk.constants.END)
+            lb.selection_set(idx)
+            lb.see(idx)
+
+        query.trace_add("write", refill)
+        entry.bind("<Return>", choose)
+        entry.bind("<Down>", lambda e: move(1))
+        entry.bind("<Up>", lambda e: move(-1))
+        lb.bind("<Double-Button-1>", choose)
+        lb.bind("<Return>", choose)
+        top.bind("<Escape>", lambda e: top.destroy())
+        refill()
+        entry.focus_set()
+        top.grab_set()
+        return "break"
 
     def changeattack(self, num):
         if not self.isPalSelected():
@@ -509,7 +624,8 @@ class PalEdit():
         self.title.config(text=f"{pal.GetNickname()}")
         self.level.config(text=f"Lv. {pal.GetLevel() if pal.GetLevel() > 0 else '?'}")
 
-        self.fruitOptions['values'] = [PalInfo.PalAttacks[aval] for aval in pal.GetAvailableSkills()]
+        self._fruit_all = [PalInfo.PalAttacks[aval] for aval in self.availableAttacks(pal)]
+        self.fruitOptions['values'] = self._fruit_all
 
         p = 0
         self.learntMoves.delete(0, tk.constants.END)
@@ -1411,6 +1527,9 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         toolmenu = tk.Menu(tools, tearoff=0)
         toolmenu.add_command(label="Debug", command=self.toggleDebug)
         toolmenu.add_command(label="Generate GUID", command=self.generateguid)
+        toolmenu.add_checkbutton(label="Legal abilities only", variable=self.filterlegal,
+                                 command=lambda: self.refresh(self.editindex if self.editindex >= 0 else 0)
+                                 if self.isPalSelected() else None)
 
         tools.add_cascade(label="Tools", menu=toolmenu, underline=0)
 
@@ -1553,6 +1672,8 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.editindex = -1
         self.filename = ""
         self.gui = self.createWindow()
+        # limit ability pickers to what each pal can legally have (Tools menu toggle)
+        self.filterlegal = tk.BooleanVar(master=self.gui, value=True)
         self.resetTitle()
         self.palguidmanager: PalGuid = None
         self.is_onselect = False
@@ -1696,6 +1817,15 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.fruitPicker = StringVar()
         self.fruitOptions = ttk.Combobox(wazaDisplay, textvariable=self.fruitPicker)
         self.fruitOptions.pack(fill=tk.constants.BOTH)
+        self._fruit_all = []
+
+        def filterfruit(evt=None):
+            if evt is not None and evt.keysym in ("Up", "Down", "Return", "Escape"):
+                return
+            txt = self.fruitPicker.get().lower()
+            vals = [v for v in self._fruit_all if txt in v.lower()]
+            self.fruitOptions['values'] = vals if vals else self._fruit_all
+        self.fruitOptions.bind("<KeyRelease>", filterfruit)
         addMove = tk.Button(wazaButtons, text="➕", borderwidth=1, font=(PalEditConfig.font, PalEditConfig.ftsize - 10),
                             command=self.appendMove,
                             bg="darkgrey")
@@ -2083,6 +2213,12 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.skilldrops[2].bind("<Enter>", lambda evt, num=2: self.changetext(num))
         self.skilldrops[3].bind("<Enter>", lambda evt, num=3: self.changetext(num))
         self.skilldrops[0].bind("<Leave>", lambda evt, num=-1: self.changetext(num))
+
+        # replace the 400-entry dropdown menus with a searchable picker
+        for _n, _w in enumerate(self.skilldrops):
+            _w.bind("<Button-1>", lambda evt, n=_n: self.open_ability_search("passive", n))
+        for _n, _w in enumerate(self.attackdrops):
+            _w.bind("<Button-1>", lambda evt, n=_n: self.open_ability_search("attack", n))
         self.skilldrops[1].bind("<Leave>", lambda evt, num=-1: self.changetext(num))
         self.skilldrops[2].bind("<Leave>", lambda evt, num=-1: self.changetext(num))
         self.skilldrops[3].bind("<Leave>", lambda evt, num=-1: self.changetext(num))

@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_RockBeast_Ice_IceHorn",
     "Type": "Ice",
     "Power": 600,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "RockBeast_Ice"
+    ]
 }

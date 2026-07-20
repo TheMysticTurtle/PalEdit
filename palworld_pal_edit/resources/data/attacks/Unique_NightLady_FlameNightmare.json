@@ -2,5 +2,10 @@
     "CodeName": "EPalWazaID::Unique_NightLady_FlameNightmare",
     "Type": "Dark",
     "Power": 450,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "NightLady_Dark",
+        "RAID_NightLady_Dark",
+        "RAID_NightLady_Dark_2"
+    ]
 }

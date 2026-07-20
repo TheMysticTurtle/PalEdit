@@ -38,5 +38,9 @@
         "Transport": 0,
         "MonsterFarm": 0
     },
-    "Human": false
+    "Human": false,
+    "InnatePassives": [
+        "Legend",
+        "ElementBoost_Normal_2_PAL"
+    ]
 }

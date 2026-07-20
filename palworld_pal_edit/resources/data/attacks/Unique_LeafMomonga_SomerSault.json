@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_LeafMomonga_SomerSault",
     "Type": "Leaf",
     "Power": 250,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "LeafMomonga"
+    ]
 }

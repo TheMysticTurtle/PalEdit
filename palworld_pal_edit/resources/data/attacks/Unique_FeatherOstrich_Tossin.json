@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_FeatherOstrich_Tossin",
     "Type": "Earth",
     "Power": 250,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "FeatherOstrich",
+        "PREDATOR_FeatherOstrich"
+    ]
 }

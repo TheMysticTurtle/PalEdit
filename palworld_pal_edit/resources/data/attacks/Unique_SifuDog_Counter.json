@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_SifuDog_Counter",
     "Type": "Normal",
     "Power": 450,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "PREDATOR_SifuDog",
+        "SifuDog"
+    ]
 }

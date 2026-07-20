@@ -2,5 +2,10 @@
     "CodeName": "EPalWazaID::Unique_Horus_FlareBird",
     "Type": "Fire",
     "Power": 320,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "GYM_Horus",
+        "Horus",
+        "Horus_Oilrig"
+    ]
 }

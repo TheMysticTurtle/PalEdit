@@ -92,6 +92,7 @@ def update_pals(psp_pals):
         path = os.path.join(paldir, f"{code}.json")
         old = jload(path) if os.path.exists(path) else {}
         is_pal = bool(e.get("is_pal"))
+        innate = e.get("passive_skills") or []
 
         out = dict(old)  # preserve unknown extra keys
         out["CodeName"] = code
@@ -115,6 +116,7 @@ def update_pals(psp_pals):
                 "DEF": sc.get("defense", 100),
             }
             out["Suitabilities"] = e.get("work_suitability") or {}
+            out["InnatePassives"] = innate
         out["Human"] = not is_pal
 
         if old != out:
@@ -123,7 +125,31 @@ def update_pals(psp_pals):
     print(f"pals: {added} added, {updated} updated")
 
 
-def update_attacks(psp_attacks):
+def update_attacks(psp_attacks, psp_pals):
+    # Species-exclusive moves: a Unique_ move belongs to the species whose
+    # skill_set contains it. PalInfo.GetAvailableSkills hides moves whose
+    # "Exclusive" list doesn't include the pal's codename.
+    owners = {}
+    for pal_code, e in psp_pals.items():
+        for waza in (e.get("skill_set") or {}):
+            code = f"EPalWazaID::{waza}"
+            if "Unique_" in code:
+                owners.setdefault(code, []).append(pal_code)
+    # some unique moves appear in no learnset (granted situationally);
+    # fall back to the species encoded in the id: Unique_<PalCode>_<Move>
+    for code in psp_attacks:
+        if "Unique_" in code and code not in owners:
+            parts = code.split("Unique_", 1)[1].split("_")
+            for ln in range(len(parts) - 1, 0, -1):
+                cand = "_".join(parts[:ln])
+                if cand in psp_pals:
+                    owners[code] = [cand]
+                    break
+                near = [s for s in psp_pals if s.startswith(cand)]
+                if near:
+                    owners[code] = near
+                    break
+
     atkdir = os.path.join(RES, "attacks")
     by_code = {jload(os.path.join(atkdir, fn))["CodeName"]: fn for fn in os.listdir(atkdir)}
     added = updated = 0
@@ -136,10 +162,12 @@ def update_attacks(psp_attacks):
         out["Type"] = e.get("element", "Normal")
         out["Power"] = e.get("power", 0)
         out["Category"] = e.get("type", "Shot")
+        if code in owners:
+            out["Exclusive"] = sorted(owners[code])
         if old != out:
             added, updated = (added + 1, updated) if not old else (added, updated + 1)
             jsave(path, out)
-    print(f"attacks: {added} added, {updated} updated")
+    print(f"attacks: {added} added, {updated} updated, {len(owners)} exclusive")
 
 
 def update_passives(psp_passives):
@@ -147,7 +175,12 @@ def update_passives(psp_passives):
     passives = jload(ppath)
     added = sum(1 for c in psp_passives if c not in passives)
     for code, e in psp_passives.items():
-        passives[code] = {"Rating": str(e.get("rank", 1))}
+        # Rollable: can appear on wild/lucky pals; anything else is only
+        # legal on species that list it in InnatePassives
+        passives[code] = {
+            "Rating": str(e.get("rank", 1)),
+            "Rollable": bool(e.get("add_pal") or e.get("add_rare_pal")),
+        }
     jsave(ppath, passives)
     print(f"passives: {added} added, total {len(passives)}")
     return passives
@@ -255,7 +288,7 @@ def main():
     psp_passives = cache("passive_skills.json")
 
     update_pals(psp_pals)
-    update_attacks(psp_attacks)
+    update_attacks(psp_attacks, psp_pals)
     passives = update_passives(psp_passives)
     update_l10n(psp_pals, psp_attacks, passives)
     if "--icons" in sys.argv:

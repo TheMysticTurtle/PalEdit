@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_MoonQueen_MoonBlade",
     "Type": "Normal",
     "Power": 350,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "GYM_MoonQueen",
+        "MoonQueen"
+    ]
 }

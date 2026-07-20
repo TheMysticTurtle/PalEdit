@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_VolcanicMonster_MagmaAttack",
     "Type": "Fire",
     "Power": 300,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "VolcanicMonster"
+    ]
 }

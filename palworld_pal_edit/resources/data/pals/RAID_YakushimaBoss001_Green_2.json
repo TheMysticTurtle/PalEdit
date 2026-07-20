@@ -32,5 +32,6 @@
         "MonsterFarm": 0
     },
     "Human": false,
-    "RaidMoveset": {}
+    "RaidMoveset": {},
+    "InnatePassives": []
 }

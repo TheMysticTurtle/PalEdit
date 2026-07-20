@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_FireKirin_Dark_DarkTossin",
     "Type": "Dark",
     "Power": 300,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "FireKirin_Dark"
+    ]
 }

@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_DrillGame_ShellAttack",
     "Type": "Earth",
     "Power": 120,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "DrillGame",
+        "PREDATOR_DrillGame"
+    ]
 }

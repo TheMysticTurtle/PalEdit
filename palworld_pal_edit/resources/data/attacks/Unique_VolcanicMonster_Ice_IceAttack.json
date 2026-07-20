@@ -2,5 +2,9 @@
     "CodeName": "EPalWazaID::Unique_VolcanicMonster_Ice_IceAttack",
     "Type": "Ice",
     "Power": 400,
-    "Category": "Shot"
+    "Category": "Shot",
+    "Exclusive": [
+        "PREDATOR_VolcanicMonster_Ice",
+        "VolcanicMonster_Ice"
+    ]
 }

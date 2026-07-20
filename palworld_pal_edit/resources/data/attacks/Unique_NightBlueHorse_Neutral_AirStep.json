@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_NightBlueHorse_Neutral_AirStep",
     "Type": "Normal",
     "Power": 800,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "NightBlueHorse_Neutral"
+    ]
 }

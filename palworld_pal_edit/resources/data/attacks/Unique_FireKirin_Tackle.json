@@ -2,5 +2,8 @@
     "CodeName": "EPalWazaID::Unique_FireKirin_Tackle",
     "Type": "Fire",
     "Power": 300,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "FireKirin"
+    ]
 }

@@ -2,5 +2,11 @@
     "CodeName": "EPalWazaID::Unique_KingBahamut_ArmSmash",
     "Type": "Fire",
     "Power": 600,
-    "Category": "Melee"
+    "Category": "Melee",
+    "Exclusive": [
+        "KingBahamut",
+        "KingBahamut_Dragon",
+        "RAID_KingBahamut_Dragon",
+        "RAID_KingBahamut_Dragon_2"
+    ]
 }

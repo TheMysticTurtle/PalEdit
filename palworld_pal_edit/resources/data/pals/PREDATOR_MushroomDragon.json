@@ -49,5 +49,6 @@
         "Transport": 0,
         "MonsterFarm": 3
     },
-    "Human": false
+    "Human": false,
+    "InnatePassives": []
 }

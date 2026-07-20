@@ -100,32 +100,44 @@ BerryGoat to lvl 80, IVs 100/100/100 → verified on disk. Note
 `PalInfo.logger` is only set inside PalEdit's main; standalone PalInfo use
 needs a stub logger.
 
-## Feature ideas discussed with owner (2026-07-20)
+## Ability search + legality filtering (IMPLEMENTED 2026-07-20)
 
-1. **Legality filtering for passives/attacks** (owner wants dropdowns limited
-   to what a pal can normally have):
-   - Passives: psp `passive_skills.json` has `add_pal` (85/420 can roll on
-     wild pals), `add_rare_pal` (lucky), and psp `pals.json` has per-species
-     innate `passive_skills` lists (e.g. JetDragon = `["Legend",
-     "ElementBoost_Dragon_2_PAL"]`). Legal set ≈ add_pal pool ∪ species
-     innates. Data NOT currently carried into PalEdit resources — updater
-     would need to emit it (e.g. `Rollable` flag in passives.json + innate
-     list in per-pal files).
-   - Attacks: per-species learnsets already exist (`PalLearnSet`); skill
-     fruits can teach any **non-unique** move, and unique moves are
-     identifiable by `Unique_` in the EPalWazaID. Legal set ≈ learnset ∪
-     non-unique moves (optionally element-filtered "strict" mode).
-   - Plan: filter the 4 passive dropdowns + attack add-list per selected pal,
-     with a "show all" escape hatch in Config menu.
-2. **Species swap in Global Palbox**: UI already exists upstream
-   (`speciesvar` dropdown → `pal.SetType`, PalEdit.py ~line 1102) and is not
-   gated on `palguidmanager`, so it likely already works in storage mode —
-   needs a scratchpad-copy test. Polish: after swap, moveset can be illegal
-   for the new species; offer to replace EquipWaza/MasteredWaza from the new
-   species' learnset at the pal's level (learnset data already loaded).
-3. **UI redo "a bit"**: incremental Tk reorganization is the sane scope
-   (group stat/skill panels, filter toggles); a full web/modern UI rewrite is
-   a different project — don't start it casually.
+- `update_data.py` now emits: `Rollable` bool in passives.json (from psp
+  `add_pal`/`add_rare_pal`; 85/420 roll on wild pals), `InnatePassives` list
+  in per-pal files (e.g. JetDragon = Legend + ElementBoost_Dragon_2_PAL), and
+  `Exclusive` species lists on every `Unique_` attack (239 covered) — derived
+  from skill_set membership, with fallback parsing of `Unique_<PalCode>_...`
+  (exact species match, then startswith for families like Yakushima bosses).
+- `PalInfo`: `PassiveRollable` dict, `GetLegalPassives(species)`,
+  `PalObject._innate_passives`. Legal passives = rollable ∪ innate.
+- `PalEdit`: the 4 passive OptionMenus + 3 equipped-attack OptionMenus now
+  intercept `<Button-1>` → `open_ability_search(kind, num)`, a searchable
+  Toplevel picker (Entry filters as you type, arrows/Enter/double-click,
+  Esc closes). Rows show rating (`Swift  [+4]`) / power (`Fire Tackle  (115)`)
+  which also disambiguates duplicate localized names — the picker passes the
+  EXACT code (`changeskill(num, code=...)` bypasses the old ambiguous
+  name→code index lookup; two passives are both named "Swift"!).
+  `availableAttacks/availablePassives(pal)` honour the **Tools > "Legal
+  abilities only"** checkbutton (`self.filterlegal`, default on); equipped
+  abilities always stay listed. Fruit combobox filters as you type and uses
+  the same legality source.
+- Tested headless on palbox copies (popup open→search→choose→save→re-parse):
+  Caprity can't get Legend when filtered, can when unfiltered; zero foreign
+  uniques leak into any box pal's attack list; Rare+Legend and an equipped
+  unique survived the disk round-trip. NOTE: many pals legitimately have no
+  unique move (e.g. Kitsunebi/Foxparks — all-generic learnset). Synthetic
+  `event_generate("<Return>")` is flaky without real focus — test via the
+  direct code paths (`changeskill(n, code)`, `attacks[n].set + changeattack`).
+
+## Remaining polish ideas
+
+1. **Species swap** (works today, verified on a copy: Caprity→WorldTreeDragon
+   persisted, suits + moves auto-cleansed): recompute MaxHP on swap, maybe
+   auto-fill EquipWaza from new learnset; gender-locked species warning.
+2. **UI redo "a bit"**: group stat/skill panels, search box over pal list.
+   A web UI is a different project — don't start casually.
+3. Breeding-inherited passives make "strictly legal" fuzzy — current
+   "obtainable" definition (rollable ∪ innate) is the sane default.
 
 ## Publishing
 
