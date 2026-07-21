@@ -38,5 +38,7 @@
     "Human": false,
     "InnatePassives": [
         "Nocturnal"
-    ]
+    ],
+    "DeckIndex": -1,
+    "TowerBoss": false
 }

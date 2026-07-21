@@ -117,6 +117,9 @@ def update_pals(psp_pals):
             }
             out["Suitabilities"] = e.get("work_suitability") or {}
             out["InnatePassives"] = innate
+            # DeckIndex >= 0 means the species is catchable (in the Paldeck)
+            out["DeckIndex"] = e.get("pal_deck_index", -1)
+            out["TowerBoss"] = bool(e.get("is_tower_boss"))
         out["Human"] = not is_pal
 
         if old != out:

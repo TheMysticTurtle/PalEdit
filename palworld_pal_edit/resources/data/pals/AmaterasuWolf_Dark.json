@@ -39,5 +39,7 @@
         "MonsterFarm": 0
     },
     "Human": false,
-    "InnatePassives": []
+    "InnatePassives": [],
+    "DeckIndex": 111,
+    "TowerBoss": false
 }

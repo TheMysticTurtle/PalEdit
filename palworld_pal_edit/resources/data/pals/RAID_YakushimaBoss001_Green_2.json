@@ -33,5 +33,7 @@
     },
     "Human": false,
     "RaidMoveset": {},
-    "InnatePassives": []
+    "InnatePassives": [],
+    "DeckIndex": -1,
+    "TowerBoss": false
 }

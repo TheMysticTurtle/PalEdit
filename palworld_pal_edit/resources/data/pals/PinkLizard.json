@@ -41,5 +41,7 @@
     "Human": false,
     "InnatePassives": [
         "ElementResist_Normal_1_PAL"
-    ]
+    ],
+    "DeckIndex": 69,
+    "TowerBoss": false
 }
