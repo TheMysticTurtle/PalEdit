@@ -1082,15 +1082,17 @@ PalPassives = {}
 PassiveDescriptions = {}
 PassiveRating = {}
 PassiveRollable = {}
+PassiveGroup = {}
 
 
 def LoadPassives(lang="en-GB"):
-    global PalPassives, PassiveDescriptions, PassiveRating, PassiveRollable
+    global PalPassives, PassiveDescriptions, PassiveRating, PassiveRollable, PassiveGroup
 
     PalPassives = {}
     PassiveDescriptions = {}
     PassiveRating = {}
     PassiveRollable = {}
+    PassiveGroup = {}
 
     if lang == "":
         lang = "en-GB"
@@ -1105,7 +1107,7 @@ def LoadPassives(lang="en-GB"):
 
             d = json.loads(datafile.read())
             l = json.loads(passivefile.read())
-            
+
             for i in d:
                 code = i
                 PalPassives[code] = l[code]["Name"]
@@ -1113,6 +1115,7 @@ def LoadPassives(lang="en-GB"):
                 PassiveRating[code] = d[i]["Rating"]
                 # default True so passives without data are never hidden
                 PassiveRollable[code] = d[i].get("Rollable", True)
+                PassiveGroup[code] = d[i].get("Group", "Other")
                 #print(i, l[code]["Name"])
             PalPassives = dict(sorted(PalPassives.items()))
 

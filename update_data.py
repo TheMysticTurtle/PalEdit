@@ -173,16 +173,45 @@ def update_attacks(psp_attacks, psp_pals):
     print(f"attacks: {added} added, {updated} updated, {len(owners)} exclusive")
 
 
+# broad, user-facing buckets a passive's effects fall into, matched by
+# substring against psp effect `type` values (checked in order)
+PASSIVE_GROUP_RULES = [
+    ("Attack", ("Attack", "ElementBoost")),
+    ("Defense", ("Defense", "ElementResist", "MaxHP", "Shield")),
+    ("Work", ("CraftSpeed", "CollectItem", "Work", "Logging", "Mining",
+              "Watering", "Planting", "Kindling", "Cooling", "Transport",
+              "Generate", "Medicine", "Handiwork", "Farming")),
+    ("Movement", ("MoveSpeed", "Jump", "Dash", "Ride")),
+    ("Utility", ("Sanity", "FullStomatch", "FullStomach", "Hunger", "Temperature",
+                 "MaxInventoryWeight", "Capture", "Exp", "Homing", "Recovery")),
+]
+
+
+def _passive_group(psp_entry):
+    """Classify a passive by its first meaningful effect type."""
+    for eff in psp_entry.get("effects", []):
+        etype = eff.get("type") or ""
+        if etype in ("", "None"):
+            continue
+        for group, needles in PASSIVE_GROUP_RULES:
+            if any(n in etype for n in needles):
+                return group
+        return "Other"
+    return "Other"
+
+
 def update_passives(psp_passives):
     ppath = os.path.join(RES, "passives.json")
     passives = jload(ppath)
     added = sum(1 for c in psp_passives if c not in passives)
     for code, e in psp_passives.items():
         # Rollable: can appear on wild/lucky pals; anything else is only
-        # legal on species that list it in InnatePassives
+        # legal on species that list it in InnatePassives. Group buckets the
+        # passive by effect for the grouped picker.
         passives[code] = {
             "Rating": str(e.get("rank", 1)),
             "Rollable": bool(e.get("add_pal") or e.get("add_rare_pal")),
+            "Group": _passive_group(e),
         }
     jsave(ppath, passives)
     print(f"passives: {added} added, total {len(passives)}")
