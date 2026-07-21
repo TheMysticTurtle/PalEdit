@@ -39,5 +39,7 @@
     "Human": false,
     "InnatePassives": [
         "Salvation"
-    ]
+    ],
+    "DeckIndex": 197,
+    "TowerBoss": false
 }

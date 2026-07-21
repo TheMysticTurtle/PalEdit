@@ -40,5 +40,7 @@
     "Human": false,
     "InnatePassives": [
         "ElementBoost_Leaf_2_PAL"
-    ]
+    ],
+    "DeckIndex": 186,
+    "TowerBoss": false
 }

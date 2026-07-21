@@ -51,5 +51,7 @@
     "Human": false,
     "InnatePassives": [
         "PAL_rude"
-    ]
+    ],
+    "DeckIndex": -1,
+    "TowerBoss": false
 }

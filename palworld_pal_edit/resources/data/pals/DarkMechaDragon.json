@@ -40,5 +40,7 @@
     "InnatePassives": [
         "Invader",
         "Alien"
-    ]
+    ],
+    "DeckIndex": 196,
+    "TowerBoss": false
 }

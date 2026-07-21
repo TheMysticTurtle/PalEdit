@@ -42,5 +42,7 @@
     "InnatePassives": [
         "Legend",
         "ElementBoost_Normal_2_PAL"
-    ]
+    ],
+    "DeckIndex": 198,
+    "TowerBoss": false
 }

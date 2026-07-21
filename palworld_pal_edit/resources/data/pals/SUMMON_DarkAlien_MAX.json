@@ -38,5 +38,7 @@
     "Human": false,
     "InnatePassives": [
         "Alien"
-    ]
+    ],
+    "DeckIndex": 145,
+    "TowerBoss": false
 }

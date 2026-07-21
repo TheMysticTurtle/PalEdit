@@ -39,5 +39,7 @@
     "Human": false,
     "InnatePassives": [
         "Deffence_up1"
-    ]
+    ],
+    "DeckIndex": 107,
+    "TowerBoss": false
 }

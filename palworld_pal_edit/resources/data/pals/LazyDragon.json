@@ -39,5 +39,7 @@
     "Human": false,
     "InnatePassives": [
         "PAL_FullStomach_Up_1"
-    ]
+    ],
+    "DeckIndex": 94,
+    "TowerBoss": false
 }

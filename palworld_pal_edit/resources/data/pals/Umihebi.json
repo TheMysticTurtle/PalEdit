@@ -40,5 +40,7 @@
     "Human": false,
     "InnatePassives": [
         "ElementBoost_Aqua_2_PAL"
-    ]
+    ],
+    "DeckIndex": 121,
+    "TowerBoss": false
 }

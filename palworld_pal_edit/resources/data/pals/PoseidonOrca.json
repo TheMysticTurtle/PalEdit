@@ -41,5 +41,7 @@
     "InnatePassives": [
         "Legend",
         "Nushi"
-    ]
+    ],
+    "DeckIndex": 201,
+    "TowerBoss": false
 }

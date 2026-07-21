@@ -1054,6 +1054,8 @@ def LoadPals(lang="en-GB"):
                                                   i["Scaling"] if "Scaling" in i else None,
                                                   i["Suitabilities"] if "Suitabilities" in i else {})
             PalSpecies[i["CodeName"]]._innate_passives = i.get("InnatePassives", [])
+            PalSpecies[i["CodeName"]]._deck_index = i.get("DeckIndex", -1)
+            PalSpecies[i["CodeName"]]._tower_boss = i.get("TowerBoss", False)
             if t:
                 PalSpecies[i["CodeName"]]._suits = PalSpecies[i["CodeName"].replace("GYM_", "")]._suits
                 PalSpecies[i["CodeName"]]._scaling = PalSpecies[i["CodeName"].replace("GYM_", "")]._scaling
