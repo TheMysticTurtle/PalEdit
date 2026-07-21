@@ -29,8 +29,12 @@ individually.
   folder before the first write of each editing session.
 - Hide the stale-player warning when editing the Global Palbox, where it does
   not apply.
+- Modern dark theme (centralised palette applied across the UI).
 
 ## Fixes
+
+Work-suitability, move, and species-change handling were audited against the
+public 1.0 editor *palworld-save-pal* to confirm the correct 1.0 field model.
 
 - Fix work-suitability corruption. Pals lost their farming/grazing/kindling
   behaviour because opening and saving injected a zero-rank entry into
@@ -43,3 +47,12 @@ individually.
   minimum from the previous pal could clamp and later write a wrong value. The
   range is now set before the value, and the write-back is skipped during
   selection refresh.
+- Remove the pre-1.0 `CraftSpeeds` field. `SetType` wrote this field on every
+  species change; 1.0 saves have no such field and the game derives work
+  suitability from species data plus `GotWorkSuitabilityAddRankList`. It is no
+  longer written and is stripped on load.
+- Stop `MasteredWaza` pollution. The move list was auto-filled with the whole
+  species learnset on load, so opening and saving added phantom "mastered"
+  moves to every pal. `MasteredWaza` now holds only moves taught beyond the
+  natural learnset (matching the game); the displayed move pool is derived and
+  never written. Previously polluted lists are cleaned on load.
