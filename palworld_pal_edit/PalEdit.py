@@ -468,11 +468,33 @@ class PalEdit():
 
         self.refresh(i)
 
-    def availableAttacks(self, pal):
-        """Attack codes offered for this pal, honouring the legal-only toggle."""
-        if getattr(self, 'filterlegal', None) is None or self.filterlegal.get():
-            return pal.GetAvailableSkills()
-        codes = [c for c in PalInfo.PalAttacks if c not in ("", "None", "EPalWazaID::None")]
+    # attack tiers offered in the picker, widest legal set first
+    ATTACK_TIERS = ("standard", "fruit", "all")
+    ATTACK_TIER_LABELS = {
+        "standard": "Standard (learnset)",
+        "fruit": "Fruit-teachable",
+        "all": "All attacks",
+    }
+
+    def availableAttacks(self, pal, tier=None):
+        """Attack codes offered for this pal at the given tier.
+
+        tier "standard" = the species' natural learnset; "fruit" = anything a
+        skill fruit can legitimately teach it (non-unique moves plus its own
+        unique); "all" = every attack in the game. When tier is None the
+        global legal-only toggle decides (fruit when on, all when off)."""
+        if tier is None:
+            tier = "fruit" if (getattr(self, 'filterlegal', None) is None
+                               or self.filterlegal.get()) else "all"
+        if tier == "all":
+            codes = [c for c in PalInfo.PalAttacks if c not in ("", "None", "EPalWazaID::None")]
+        elif tier == "standard":
+            codes = [c for c in PalInfo.PalLearnSet.get(pal.GetCodeName(), {})
+                     if c in PalInfo.PalAttacks]
+        else:  # fruit-teachable
+            codes = list(pal.GetAvailableSkills())
+        # the picker supplies its own "None" (clear) row; drop empty sentinels
+        codes = [c for c in codes if c not in ("", "None", "EPalWazaID::None")]
         codes.sort(key=lambda c: PalInfo.PalAttacks[c])
         return codes
 
@@ -490,30 +512,36 @@ class PalEdit():
         return codes
 
     def open_ability_search(self, kind, num):
-        """Searchable picker used by the passive and equipped-attack slots."""
+        """Searchable picker used by the passive and equipped-attack slots.
+
+        For attacks a small toolbar adds a tier toggle (standard / fruit /
+        all), an element filter and a sort order (name or power)."""
         if not self.isPalSelected():
             return "break"
         i = int(self.listdisplay.curselection()[0])
         pal = self.FilteredPals()[i]
 
-        # rows of (display, code); display carries rating/power so duplicate
-        # localized names (e.g. two passives both called "Swift") stay distinct
-        if kind == "passive":
-            rows = [(f"{PalInfo.PalPassives[c]}  [{int(PalInfo.PassiveRating.get(c, '0')):+d}]", c)
-                    for c in self.availablePassives(pal)]
-            anchor = self.skilldrops[num]
-        else:
-            rows = [(f"{PalInfo.PalAttacks[c]}  ({PalInfo.AttackPower.get(c, '?')})", c)
-                    for c in self.availableAttacks(pal)]
-            anchor = self.attackdrops[num]
-        rows.sort(key=lambda r: r[0].lower())
-        rows.insert(0, ("None", "None"))
+        anchor = self.skilldrops[num] if kind == "passive" else self.attackdrops[num]
 
         top = tk.Toplevel(self.gui)
         top.title(self.i18n.get('search_title', "Search..."))
         top.transient(self.gui)
         x, y = anchor.winfo_rootx(), anchor.winfo_rooty() + anchor.winfo_height()
-        top.geometry(f"340x400+{x}+{y}")
+        top.geometry(f"360x440+{x}+{y}")
+
+        # --- attack-only filter toolbar ---
+        default_tier = "fruit" if (getattr(self, 'filterlegal', None) is None
+                                   or self.filterlegal.get()) else "all"
+        tier_var = tk.StringVar(value=default_tier)
+        element_var = tk.StringVar(value="All")
+        sort_var = tk.StringVar(value="Power")
+        if kind == "attack":
+            bar = tk.Frame(top)
+            bar.pack(fill=tk.constants.X, padx=4, pady=(4, 0))
+            tk.OptionMenu(bar, tier_var, *self.ATTACK_TIERS).pack(side=tk.constants.LEFT)
+            elements = ["All"] + [e for e in sorted(set(PalInfo.AttackTypes.values())) if e]
+            tk.OptionMenu(bar, element_var, *elements).pack(side=tk.constants.LEFT)
+            tk.OptionMenu(bar, sort_var, "Power", "Name").pack(side=tk.constants.LEFT)
 
         query = tk.StringVar()
         entry = tk.Entry(top, textvariable=query, font=(PalEditConfig.font, PalEditConfig.ftsize))
@@ -527,7 +555,28 @@ class PalEdit():
         lb.pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.BOTH)
         sb.config(command=lb.yview)
 
+        rows = []
         visible = []
+
+        def rebuild(*_):
+            # recompute the candidate rows from the current toolbar settings
+            rows.clear()
+            if kind == "passive":
+                for c in self.availablePassives(pal):
+                    rows.append((f"{PalInfo.PalPassives[c]}  [{int(PalInfo.PassiveRating.get(c, '0')):+d}]", c))
+                rows.sort(key=lambda r: r[0].lower())
+            else:
+                codes = self.availableAttacks(pal, tier_var.get())
+                if element_var.get() != "All":
+                    codes = [c for c in codes if PalInfo.AttackTypes.get(c) == element_var.get()]
+                if sort_var.get() == "Power":
+                    codes.sort(key=lambda c: (-PalInfo.AttackPower.get(c, 0), PalInfo.PalAttacks[c]))
+                else:
+                    codes.sort(key=lambda c: PalInfo.PalAttacks[c])
+                for c in codes:
+                    rows.append((f"{PalInfo.PalAttacks[c]}  ({PalInfo.AttackPower.get(c, '?')})  {PalInfo.AttackTypes.get(c, '')}", c))
+            rows.insert(0, ("None", "None"))
+            refill()
 
         def refill(*_):
             txt = query.get().lower()
@@ -543,6 +592,9 @@ class PalEdit():
                             lb.itemconfig(tk.constants.END, {'fg': PalEdit.mean_color(col, "000000")})
             if lb.size() > 0:
                 lb.selection_set(0)
+
+        for v in (tier_var, element_var, sort_var):
+            v.trace_add("write", rebuild)
 
         def choose(*_):
             sel = lb.curselection()
@@ -572,7 +624,7 @@ class PalEdit():
         lb.bind("<Double-Button-1>", choose)
         lb.bind("<Return>", choose)
         top.bind("<Escape>", lambda e: top.destroy())
-        refill()
+        rebuild()
         entry.focus_set()
         top.grab_set()
         return "break"
