@@ -129,6 +129,39 @@ needs a stub logger.
   `event_generate("<Return>")` is flaky without real focus — test via the
   direct code paths (`changeskill(n, code)`, `attacks[n].set + changeattack`).
 
+## Progress log (2026-07-26 session, Opus continuing Fable's work)
+
+Done and merged to main (each its own feature branch + --no-ff bubble, kept
+for cherry-picking):
+- `feature/session-backup` — DONE. backup_save() copies the .sav to a
+  PalEdit-backups/ folder once per file per session before the first write;
+  failed backup aborts the save.
+- `feature/nickname-edit` — DONE. Double-click the name label; SetNickname
+  writes NickName + FilteredNickName.
+- `feature/palbox-add-remove` — DONE. Clone/Add New Pal/Delete work in the
+  Global Palbox (storage_mode) against the flat 960-slot array. Add defaults
+  to CubeTurtle (Tetroise). Helpers: _palbox_values/_palbox_container_id/
+  _next_free_slot_index/_find_empty_palbox_entry/_palbox_insert etc.
+- `feature/stale-warning-storage` — DONE. Hides the stale-player warning in
+  palbox mode (see research below).
+- Also: `.gitattributes` line-ending normalization; DeckIndex/TowerBoss
+  metadata emitted by update_data.py; repo renamed src→PalEdit.
+
+### Research findings (task: caps + stale warning)
+- **Stale-player warning**: CONFIRMED owner's hunch. Warning text (PalEdit.py
+  ~2722) is purely a world-save (Level.sav + Players/*.sav) concern — pals
+  break when their owning player's Players/<guid>.sav is stale. Global Palbox
+  has NO player data, so it's irrelevant there. Fixed: hidden in storage_mode.
+- **Editable caps in the current UI**: Pal Souls (Rank_HP/Attack/Defence/
+  CraftSpeed) sliders already 0–20 (matches in-game soul max). Condensation
+  Rank UI 1–5 (0–4 stars) = game max. IVs (Talent_*) 0–100. **Work
+  suitability spinboxes are capped at 5** (PalEdit.py ~2471 `to=5`) — this is
+  the "caps at 5" the owner hit. Raising it (owner wants up to 10 for
+  make-anything pals) is an UNRESTRICTED-mode toggle to build in
+  `feature/stats-panel` (#18): default = standard caps, toggle = raise the
+  work-suitability (and optionally soul/condensation) maxima. Note the game
+  itself caps work suitability at 5 by normal means; >5 is a power-user knob.
+
 ## Branch workflow (agreed 2026-07-26 — SUPERSEDES all earlier roadmap notes)
 
 Goal: upstream (EternalWraith) should be able to cherry-pick features with a
