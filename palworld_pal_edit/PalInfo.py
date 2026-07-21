@@ -306,8 +306,15 @@ class PalEntity:
         if not "MasteredWaza" in self._obj:
             self._obj["MasteredWaza"] = copy.deepcopy(EmptyMovesObject)
 
-        self._learntMoves = self._obj["MasteredWaza"]["value"]["values"]
+        # EquipWaza = the equipped moves; MasteredWaza = moves taught BEYOND the
+        # species' natural level-up learnset (fruit skills). The game derives
+        # natural moves from species + level, so they must NOT be written into
+        # MasteredWaza. _learntMoves is a display-only pool rebuilt by
+        # CleanseAttacks; it is never written to the save.
         self._equipMoves = self._obj["EquipWaza"]["value"]["values"]
+        self._masteredMoves = self._obj["MasteredWaza"]["value"]["values"]
+        self._learntMoves = []
+        self.CleanseAttacks()
 
         self.CleanseAttacks()
         if not "Hp" in self._obj:
@@ -389,38 +396,36 @@ class PalEntity:
             avail_skills.remove("EPalWazaID::None")
         return avail_skills
 
+    def _naturalMoves(self):
+        """Moves the species learns by levelling, up to this pal's level."""
+        learnset = PalLearnSet.get(self._type.GetCodeName(), {})
+        return [m for m in learnset
+                if self._level >= learnset[m] and m in PalAttacks]
+
+    def _validMove(self, m):
+        if m in ("None", "EPalWazaID::None") or "MAX" in m:
+            return False
+        excl = SkillExclusivity.get(m)
+        return excl is None or self._type.GetCodeName() in excl
+
     def CleanseAttacks(self):
-        i = 0
-        while i < len(self._learntMoves):
-            remove = False
-            if self._learntMoves[i] in ["None", "EPalWazaID::None"] or "MAX" in self._learntMoves[i]:
-                remove = True
-            else:
-                # Check skill has Exclusivity
-                if not (SkillExclusivity[self._learntMoves[i]] is None):
-                    if not self._type.GetCodeName() in SkillExclusivity[self._learntMoves[i]]:
-                        remove = True
-                # Check level are available for Skills
-                if self._learntMoves[i] in PalLearnSet[self._type.GetCodeName()]:
-                    if not self._level >= PalLearnSet[self._type.GetCodeName()][self._learntMoves[i]]:
-                        if not self._learntMoves[i] in self._equipMoves:
-                            remove = True
+        """Rebuild the display move-pool and keep the save's move lists valid.
 
-            if remove:
-                if self._learntMoves[i] in self._equipMoves:
-                    self._equipMoves.remove(self._learntMoves[i])
-                self._learntMoves.pop(i)
-            else:
-                i += 1
-
-        for skill_CodeName in PalLearnSet[self._type.GetCodeName()]:
-            if not skill_CodeName in self._learntMoves:
-                if PalLearnSet[self._type.GetCodeName()][skill_CodeName] <= self._level:
-                    self._learntMoves.append(skill_CodeName)
-
-        for i in self._equipMoves:
-            if not i in self._learntMoves:
-                self._learntMoves.append(i)
+        MasteredWaza is pruned to only the *taught extras* (valid moves that
+        are not part of the natural learnset); natural learnset moves are the
+        game's to grant and must not be persisted there. EquipWaza is pruned of
+        invalid moves. _learntMoves is a display-only union and is never saved.
+        """
+        natural = self._naturalMoves()
+        natural_set = set(natural)
+        self._masteredMoves[:] = [m for m in self._masteredMoves
+                                  if self._validMove(m) and m not in natural_set]
+        self._equipMoves[:] = [m for m in self._equipMoves if self._validMove(m)]
+        pool = []
+        for m in natural + self._masteredMoves + self._equipMoves:
+            if m not in pool:
+                pool.append(m)
+        self._learntMoves[:] = pool
 
     def GetType(self):
         return self._type
@@ -650,6 +655,12 @@ class PalEntity:
             self._skills[slot] = skill
 
     def SetAttackSkill(self, slot, attack):
+        # equipping a move the pal doesn't learn naturally requires it to be
+        # recorded as a taught (mastered) move so the game accepts it
+        if (attack not in ("None", "EPalWazaID::None")
+                and attack not in self._naturalMoves()
+                and attack not in self._masteredMoves):
+            self._masteredMoves.append(attack)
         if slot > len(self._equipMoves) - 1:
             self._equipMoves.append(attack)
         else:
@@ -705,31 +716,30 @@ class PalEntity:
                 f"[ERROR:] Failed to update rank for: '{self.GetName()}'")  # we probably could get rid of this line, since you add rank if missing - same with level
 
     def PurgeAttack(self, slot):
+        # unequip: the move stays known; just clear the equip slot
         if slot >= len(self._equipMoves):
             return
-        p = self._equipMoves.pop(slot)
-        if not p in PalLearnSet[self.GetCodeName()]:
-            self._learntMoves.remove(p)
-        else:
-            if PalLearnSet[self.GetCodeName()][p] > self.GetLevel():
-                self._learntMoves.remove(p)
+        self._equipMoves.pop(slot)
+        self.CleanseAttacks()
 
     def StripAttack(self, name):
-        name = name.replace("⚔","").replace("🏹","")
-        print(name)
-        print(self._learntMoves)
-        strip = False
-        if not name in self._equipMoves:
-            if not name in PalLearnSet[self.GetCodeName()]:
-                strip = True
-            elif PalLearnSet[self.GetCodeName()][name] > self.GetLevel():
-                strip = True
-        if strip:
-            self._learntMoves.remove(name)
+        # forget a move entirely: drop it from equipped and taught lists. A
+        # natural learnset move can't truly be forgotten (the game re-grants
+        # it), so it simply reappears in the display after CleanseAttacks.
+        name = name.replace("⚔", "").replace("🏹", "")
+        if name in self._equipMoves:
+            self._equipMoves.remove(name)
+        if name in self._masteredMoves:
+            self._masteredMoves.remove(name)
+        self.CleanseAttacks()
 
     def FruitAttack(self, name):
-        if not name in self._learntMoves:
-            self._learntMoves.append(name)
+        # teach a move: only non-natural moves need recording in MasteredWaza
+        if name in ("None", "EPalWazaID::None") or not name:
+            return
+        if name not in self._naturalMoves() and name not in self._masteredMoves:
+            self._masteredMoves.append(name)
+        self.CleanseAttacks()
 
     def RemoveSkill(self, slot):
         if slot < len(self._skills):
