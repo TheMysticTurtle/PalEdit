@@ -11,3 +11,7 @@ compile_local.bat
 psp_data_cache
 temp.json
 pals/error_*.json
+
+# Claude working notes (not for the public repo)
+CLAUDE.md
+.claude/
