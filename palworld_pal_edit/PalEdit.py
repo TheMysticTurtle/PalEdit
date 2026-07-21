@@ -782,10 +782,16 @@ class PalEdit():
                 pp = pal.GetSuit(i)
                 sp = pt._suits[i]
                 tp = pp + sp
-                self.suits[f"{i}_var"].set(tp)
                 c = "#55FF55" if tp > sp else "#D3D3D3"
-                self.suits[f"{i}_label"].config(state=(tk.NORMAL if sp > 0 else tk.DISABLED), from_=sp, bg=c)
-                #self.suits[f"{i}_label"].config(text=tp, bg=c)
+                # Configure the spinbox range BEFORE writing the value. If the
+                # value were set first, a stale minimum left over from the
+                # previously-selected pal could silently clamp it, and a later
+                # arrow-click would then write that wrong value back — the
+                # "flipflop" that corrupted work suitabilities across pals.
+                self.suits[f"{i}_label"].config(
+                    state=(tk.NORMAL if sp > 0 else tk.DISABLED),
+                    from_=sp, to=max(5, tp), bg=c)
+                self.suits[f"{i}_var"].set(tp)
 
             calc = pal.CalculateIngameStats()
             self.hthstatval.config(text=calc["HP"])
@@ -795,8 +801,8 @@ class PalEdit():
         else:
             
             for i in suitabilities:
+                self.suits[f"{i}_label"].config(state=tk.DISABLED, from_=0, bg="#D3D3D3")
                 self.suits[f"{i}_var"].set(0)
-                self.suits[f"{i}_label"].config(state=tk.DISABLED, bg="#D3D3D3")
 
             self.hthstatval.config(text="n/a")
             self.matkstatval.config(text="n/a")
@@ -841,6 +847,11 @@ class PalEdit():
         self.is_onselect = False
 
     def setsuits(self):
+        # Never write while onselect is refreshing the spinboxes for a newly
+        # selected pal — that path only *displays* values, and writing here
+        # would push one pal's suitabilities onto another.
+        if getattr(self, 'is_onselect', False):
+            return
         if not self.isPalSelected():
             return
         i = int(self.listdisplay.curselection()[0])
