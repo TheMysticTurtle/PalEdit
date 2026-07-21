@@ -317,11 +317,15 @@ class PalEntity:
         if "GotWorkSuitabilityAddRankList" not in self._obj:
             self._obj["GotWorkSuitabilityAddRankList"] = copy.deepcopy(EmptyGotWorkObject)
         self.AddSuits = self._obj["GotWorkSuitabilityAddRankList"]
-        for i in suitnames:
-            if f"EPalWorkSuitability::{i}" not in [x["WorkSuitability"]["value"]["value"] for x in self.AddSuits["value"]["values"]]:
-                t = copy.deepcopy(EmptyWorkObject)
-                t["WorkSuitability"]["value"]["value"] = f"EPalWorkSuitability::{i}"
-                self.AddSuits["value"]["values"].append(t)
+        # The game only records work-suitability bonuses that are actually
+        # non-zero. Older PalEdit builds eagerly wrote a zero-rank entry for
+        # every suitability, bloating the list with 13 phantom entries per pal
+        # — which could break in-game work assignment (grazing/farming pals
+        # doing nothing). Prune zero-rank entries so the list matches what the
+        # game itself writes; SetSuit re-creates an entry only when needed.
+        self.AddSuits["value"]["values"] = [
+            x for x in self.AddSuits["value"]["values"] if x["Rank"]["value"] != 0
+        ]
                 
                 
     def GetSuit(self, suit):
@@ -331,9 +335,20 @@ class PalEntity:
         return 0
 
     def SetSuit(self, suit, value):
-        for i in self.AddSuits["value"]["values"]:
-            if i["WorkSuitability"]["value"]["value"] == f"EPalWorkSuitability::{suit}":
-                i["Rank"]["value"] = value
+        key = f"EPalWorkSuitability::{suit}"
+        entries = self.AddSuits["value"]["values"]
+        for i in entries:
+            if i["WorkSuitability"]["value"]["value"] == key:
+                if value == 0:
+                    entries.remove(i)  # drop the entry rather than store a zero
+                else:
+                    i["Rank"]["value"] = value
+                return
+        if value != 0:
+            t = copy.deepcopy(EmptyWorkObject)
+            t["WorkSuitability"]["value"]["value"] = key
+            t["Rank"]["value"] = value
+            entries.append(t)
 
     def IsHuman(self):
         return self._type._human
