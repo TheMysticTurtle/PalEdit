@@ -29,7 +29,6 @@ individually.
   folder before the first write of each editing session.
 - Hide the stale-player warning when editing the Global Palbox, where it does
   not apply.
-- Modern dark theme (centralised palette applied across the UI).
 
 ## Fixes
 
