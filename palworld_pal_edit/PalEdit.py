@@ -129,6 +129,9 @@ class PalEditConfig:
     # index = rating + 3; Palworld 1.0 adds rating-5 passives (last entry)
     skill_col = ["#DE3C3A", "#DE3C3A", "#DE3C3A", "#000000", "#DFE8E7", "#DFE8E7", "#FEDE00", "#68FFD8", "#C77DFF"]
     levelcap = 80
+    # species a freshly-added Global Palbox pal starts as: CubeTurtle
+    # ("Tetroise") — a nod to the Mystic Testudine
+    default_new_species = "CubeTurtle"
 
 
 class PalEdit():
@@ -1356,14 +1359,165 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         else:
             messagebox.showerror("Select a file", self.i18n['msg_select_file'])
 
+    # ------------------------------------------------------------------
+    # Global Palbox (storage_mode) slot management
+    #
+    # GlobalPalStorage.sav is a flat array of 960 slots. Occupied slots share
+    # one ContainerId and carry a sparse SlotIndex; free slots are null
+    # placeholders (CharacterID "None", zero ContainerId/InstanceId). Adding a
+    # pal means claiming a free slot for the palbox container; removing one
+    # returns its slot to the null state. Array length stays fixed at 960.
+    # ------------------------------------------------------------------
+    ZERO_GUID = "00000000-0000-0000-0000-000000000000"
+
+    def _palbox_values(self):
+        return self.data['properties']['SaveParameterArray']['value']['values']
+
+    def _palbox_container_id(self):
+        """ContainerId shared by the pals already in the box, or None if empty."""
+        for e in self._palbox_values():
+            sp = e['SaveParameter']['value']
+            if sp.get('CharacterID', {}).get('value', 'None') not in ('None', ''):
+                return sp['SlotId']['value']['ContainerId']['value']['ID']['value']
+        return None
+
+    def _next_free_slot_index(self, container_id):
+        """Lowest SlotIndex not yet used within the given container."""
+        used = set()
+        for e in self._palbox_values():
+            sp = e['SaveParameter']['value']
+            sid = sp['SlotId']['value']
+            if str(sid['ContainerId']['value']['ID']['value']) == str(container_id):
+                used.add(sid['SlotIndex']['value'])
+        idx = 0
+        while idx in used:
+            idx += 1
+        return idx
+
+    def _find_empty_palbox_entry(self):
+        for e in self._palbox_values():
+            if e['SaveParameter']['value'].get('CharacterID', {}).get('value', 'None') in ('None', ''):
+                return e
+        return None
+
+    def _find_palbox_entry(self, instance_guid):
+        for e in self._palbox_values():
+            if str(e['InstanceId']['value']['InstanceId']['value']) == str(instance_guid):
+                return e
+        return None
+
+    def _find_palbox_pal(self, instance_guid):
+        for p in self.palbox:
+            if str(p.GetPalInstanceGuid()) == str(instance_guid):
+                return p
+        return None
+
+    def _palbox_insert(self, source_sp):
+        """Place a deep copy of source_sp (a SaveParameter value dict) into a
+        free palbox slot as a new, independent pal. Returns the new InstanceId,
+        or None if the box is full."""
+        empty = self._find_empty_palbox_entry()
+        if empty is None:
+            messagebox.showerror("Palbox full", "The Global Palbox has no free slots.")
+            return None
+        container = self._palbox_container_id() or UUID.from_str(str(uuid.uuid4()))
+        idx = self._next_free_slot_index(container)
+        # copy the content first, then stamp a fresh, unique identity onto it
+        empty['SaveParameter']['value'] = copy.deepcopy(source_sp)
+        new_iid = UUID.from_str(str(uuid.uuid4()))
+        empty['InstanceId']['value']['InstanceId']['value'] = new_iid
+        slot = empty['SaveParameter']['value']['SlotId']['value']
+        slot['ContainerId']['value']['ID']['value'] = UUID.from_str(str(container))
+        slot['SlotIndex']['value'] = idx
+        return new_iid
+
+    def clonepal_storage(self):
+        i = int(self.listdisplay.curselection()[0])
+        pal = self.FilteredPals()[i]
+        new_iid = self._palbox_insert(pal._obj)
+        if new_iid is None:
+            return
+        self.loaddata(self.data)
+        self._select_palbox_instance(new_iid)
+
+    def addpal_storage(self):
+        """Add a brand-new default pal (a turtle) to the Global Palbox."""
+        blank = self._find_empty_palbox_entry()
+        if blank is None:
+            messagebox.showerror("Palbox full", "The Global Palbox has no free slots.")
+            return
+        # a free slot is already a clean level-1 blank; claim it, then give it
+        # a species so loaddata recognises it as an occupied slot
+        new_iid = self._palbox_insert(blank['SaveParameter']['value'])
+        if new_iid is None:
+            return
+        entry = self._find_palbox_entry(new_iid)
+        sp = entry['SaveParameter']['value']
+        sp['CharacterID']['value'] = PalEditConfig.default_new_species
+        sp['Gender']['value']['value'] = "EPalGenderType::Male"
+        self.loaddata(self.data)
+        pal = self._find_palbox_pal(new_iid)
+        if pal is not None:
+            # populate work suitabilities and the natural level-1 moveset
+            pal.SetType(PalEditConfig.default_new_species)
+            pal.SetLevel(1)
+        self.loaddata(self.data)
+        self._select_palbox_instance(new_iid)
+
+    def deletepal_storage(self):
+        i = int(self.listdisplay.curselection()[0])
+        pal = self.FilteredPals()[i]
+        if not messagebox.askyesno(
+                "Delete Pal",
+                f"Remove {pal.GetFullName()} from the Global Palbox?\n\n"
+                "This takes effect when you save; a session backup is kept."):
+            return
+        entry = self._find_palbox_entry(pal.GetPalInstanceGuid())
+        if entry is None:
+            return
+        # restore the slot to a pristine null placeholder
+        blank = self._find_empty_palbox_entry()
+        if blank is not None:
+            entry['SaveParameter']['value'] = copy.deepcopy(blank['SaveParameter']['value'])
+        else:
+            entry['SaveParameter']['value']['CharacterID']['value'] = "None"
+            entry['SaveParameter']['value']['SlotId']['value'] \
+                ['ContainerId']['value']['ID']['value'] = UUID.from_str(self.ZERO_GUID)
+        entry['InstanceId']['value']['InstanceId']['value'] = UUID.from_str(self.ZERO_GUID)
+        self.loaddata(self.data)
+
+    def _select_palbox_instance(self, instance_guid):
+        """Reselect a pal by InstanceId after the list is rebuilt."""
+        self.updateDisplay()
+        pals = self.FilteredPals()
+        for idx, p in enumerate(pals):
+            if str(p.GetPalInstanceGuid()) == str(instance_guid):
+                self.listdisplay.see(idx)
+                self.refresh(idx)
+                return
+
+    def addpal(self):
+        if getattr(self, 'storage_mode', False):
+            self.addpal_storage()
+        else:
+            messagebox.showinfo(
+                "Global Palbox only",
+                "Adding a brand-new pal is currently supported for the Global "
+                "Palbox (GlobalPalStorage.sav). For world saves, use Add Pal "
+                "to import a dumped pal.")
+
     def clonepal(self):
+        if getattr(self, 'storage_mode', False):
+            if self.isPalSelected():
+                self.clonepal_storage()
+            return
         if not self.isPalSelected() or self.palguidmanager is None:
             return
         i = int(self.listdisplay.curselection()[0])
         pal = self.FilteredPals()[i]
 
         owneruid = "00000000-0000-0000-0000-000000000000"
- 
+
 
         with open("temp.json", "wb") as f:
             f.write(json.dumps(pal._data, indent=4, cls=UUIDEncoder).encode('utf-8'))
@@ -1407,6 +1561,10 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         os.remove("temp.json")
 
     def deletepal(self):
+        if getattr(self, 'storage_mode', False):
+            if self.isPalSelected():
+                self.deletepal_storage()
+            return
         if not self.isPalSelected() or self.palguidmanager is None:
             return
         i = int(self.listdisplay.curselection()[0])
@@ -1926,6 +2084,13 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         button.config(font=(PalEditConfig.font, 12))
         button.pack(expand=True, fill=BOTH)
         self.i18n_el['btn_clone_pal'] = button
+
+        # Add a brand-new pal to the Global Palbox (starts as a turtle)
+        addbutton = Button(resourceview, text=self.i18n.get('btn_new_pal', "Add New Pal"),
+                           command=self.addpal)
+        addbutton.config(font=(PalEditConfig.font, 12))
+        addbutton.pack(expand=True, fill=BOTH)
+        self.i18n_el['btn_new_pal'] = addbutton
 
         button = Button(resourceview, text=self.i18n['btn_delete_pal'], command=self.deletepal)
         button.config(font=(PalEditConfig.font, 12))
