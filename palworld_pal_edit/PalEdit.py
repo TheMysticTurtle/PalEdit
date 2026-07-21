@@ -498,10 +498,17 @@ class PalEdit():
         codes.sort(key=lambda c: PalInfo.PalAttacks[c])
         return codes
 
-    def availablePassives(self, pal):
-        """Passive codes offered for this pal, honouring the legal-only
-        toggle; always includes whatever is currently equipped."""
-        if getattr(self, 'filterlegal', None) is None or self.filterlegal.get():
+    def availablePassives(self, pal, natural=None):
+        """Passive codes offered for this pal.
+
+        natural True limits to passives the pal can obtain naturally (wild-
+        rollable plus its species innates); False offers every passive. When
+        natural is None the global legal-only toggle decides. Whatever the
+        pal already has equipped is always included."""
+        if natural is None:
+            natural = (getattr(self, 'filterlegal', None) is None
+                       or self.filterlegal.get())
+        if natural:
             codes = PalInfo.GetLegalPassives(pal.GetCodeName())
         else:
             codes = [c for c in PalInfo.PalPassives
@@ -529,12 +536,15 @@ class PalEdit():
         x, y = anchor.winfo_rootx(), anchor.winfo_rooty() + anchor.winfo_height()
         top.geometry(f"360x440+{x}+{y}")
 
-        # --- attack-only filter toolbar ---
-        default_tier = "fruit" if (getattr(self, 'filterlegal', None) is None
-                                   or self.filterlegal.get()) else "all"
+        # --- filter toolbar (per kind) ---
+        default_natural = (getattr(self, 'filterlegal', None) is None
+                           or self.filterlegal.get())
+        default_tier = "fruit" if default_natural else "all"
         tier_var = tk.StringVar(value=default_tier)
         element_var = tk.StringVar(value="All")
         sort_var = tk.StringVar(value="Power")
+        group_var = tk.StringVar(value="All")
+        natural_var = tk.BooleanVar(value=default_natural)
         if kind == "attack":
             bar = tk.Frame(top)
             bar.pack(fill=tk.constants.X, padx=4, pady=(4, 0))
@@ -542,10 +552,22 @@ class PalEdit():
             elements = ["All"] + [e for e in sorted(set(PalInfo.AttackTypes.values())) if e]
             tk.OptionMenu(bar, element_var, *elements).pack(side=tk.constants.LEFT)
             tk.OptionMenu(bar, sort_var, "Power", "Name").pack(side=tk.constants.LEFT)
+        else:
+            bar = tk.Frame(top)
+            bar.pack(fill=tk.constants.X, padx=4, pady=(4, 0))
+            groups = ["All"] + sorted(set(PalInfo.PassiveGroup.values()))
+            tk.OptionMenu(bar, group_var, *groups).pack(side=tk.constants.LEFT)
+            tk.Checkbutton(bar, text="Natural only", variable=natural_var).pack(side=tk.constants.LEFT)
 
         query = tk.StringVar()
         entry = tk.Entry(top, textvariable=query, font=(PalEditConfig.font, PalEditConfig.ftsize))
         entry.pack(fill=tk.constants.X, padx=4, pady=4)
+
+        # blurb describing the highlighted entry, anchored to the bottom
+        desc = tk.Label(top, text="", wraplength=340, justify="left", anchor="nw",
+                        font=(PalEditConfig.font, max(8, PalEditConfig.ftsize - 8)),
+                        height=3, relief="groove", borderwidth=1)
+        desc.pack(side=tk.constants.BOTTOM, fill=tk.constants.X, padx=4, pady=(0, 4))
 
         frame = tk.Frame(top)
         frame.pack(expand=True, fill=tk.constants.BOTH, padx=4, pady=(0, 4))
@@ -558,13 +580,34 @@ class PalEdit():
         rows = []
         visible = []
 
+        def show_desc(*_):
+            sel = lb.curselection()
+            if not sel:
+                desc.config(text="")
+                return
+            code = visible[sel[0]]
+            if code == "None":
+                desc.config(text="Clear this slot.")
+            elif kind == "passive":
+                desc.config(text=PalInfo.PassiveDescriptions.get(code, ""))
+            else:
+                desc.config(text=f"{PalInfo.AttackTypes.get(code, '')} · "
+                                 f"power {PalInfo.AttackPower.get(code, '?')} · "
+                                 f"{PalInfo.AttackCats.get(code, '')}")
+
         def rebuild(*_):
             # recompute the candidate rows from the current toolbar settings
             rows.clear()
             if kind == "passive":
-                for c in self.availablePassives(pal):
-                    rows.append((f"{PalInfo.PalPassives[c]}  [{int(PalInfo.PassiveRating.get(c, '0')):+d}]", c))
-                rows.sort(key=lambda r: r[0].lower())
+                codes = self.availablePassives(pal, natural_var.get())
+                if group_var.get() != "All":
+                    codes = [c for c in codes if PalInfo.PassiveGroup.get(c, "Other") == group_var.get()]
+                # cluster by group, then name, so like effects sit together
+                codes.sort(key=lambda c: (PalInfo.PassiveGroup.get(c, "Other"),
+                                          PalInfo.PalPassives[c].lower()))
+                for c in codes:
+                    grp = PalInfo.PassiveGroup.get(c, "Other")
+                    rows.append((f"[{grp}] {PalInfo.PalPassives[c]}  [{int(PalInfo.PassiveRating.get(c, '0')):+d}]", c))
             else:
                 codes = self.availableAttacks(pal, tier_var.get())
                 if element_var.get() != "All":
@@ -592,9 +635,11 @@ class PalEdit():
                             lb.itemconfig(tk.constants.END, {'fg': PalEdit.mean_color(col, "000000")})
             if lb.size() > 0:
                 lb.selection_set(0)
+            show_desc()
 
-        for v in (tier_var, element_var, sort_var):
+        for v in (tier_var, element_var, sort_var, group_var, natural_var):
             v.trace_add("write", rebuild)
+        lb.bind("<<ListboxSelect>>", show_desc)
 
         def choose(*_):
             sel = lb.curselection()
@@ -616,6 +661,7 @@ class PalEdit():
             lb.selection_clear(0, tk.constants.END)
             lb.selection_set(idx)
             lb.see(idx)
+            show_desc()
 
         query.trace_add("write", refill)
         entry.bind("<Return>", choose)
