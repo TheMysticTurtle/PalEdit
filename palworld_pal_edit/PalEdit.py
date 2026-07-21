@@ -133,16 +133,6 @@ class PalEditConfig:
     # ("Tetroise") — a nod to the Mystic Testudine
     default_new_species = "CubeTurtle"
 
-    # --- modern dark theme palette (replaces the old grey look) ---
-    window = "#1e1f22"    # outermost window background
-    surface = "#2b2d31"   # panels / cards (was PalEditConfig.surface)
-    input_bg = "#383a40"  # inputs, listboxes, spinboxes (was PalEditConfig.input_bg)
-    disabled = "#4a4d52"  # disabled controls (was PalEditConfig.disabled)
-    fg = "#e3e5e8"        # primary text
-    fg_dim = "#b5bac1"    # secondary text
-    accent = "#5865f2"    # selection / highlight
-    danger = "#f04747"    # destructive actions
-
 
 class PalEdit():
     ranks = (0, 1, 2, 3, 4)
@@ -329,8 +319,8 @@ class PalEdit():
     def setAttackCols(self):
         for i in range(0, 3):
             if self.attacks[i].get() == "None":
-                self.attackdrops[i].config(highlightbackground=PalEditConfig.input_bg, bg=PalEditConfig.input_bg,
-                                           activebackground=PalEditConfig.input_bg)
+                self.attackdrops[i].config(highlightbackground="lightgrey", bg="lightgrey",
+                                           activebackground="lightgrey")
             else:
                 v = self.attacks[i].get()
                 basecol = PalInfo.PalElements[PalInfo.AttackTypes[v]]
@@ -642,7 +632,7 @@ class PalEdit():
                     if kind == "passive" and code != "None":
                         col = PalEditConfig.skill_col[int(PalInfo.PassiveRating.get(code, "0")) + 3]
                         if col not in ("#DFE8E7", "#000000"):
-                            lb.itemconfig(tk.constants.END, {'fg': PalEdit.mean_color(col, PalEditConfig.fg)})
+                            lb.itemconfig(tk.constants.END, {'fg': PalEdit.mean_color(col, "000000")})
             if lb.size() > 0:
                 lb.selection_set(0)
             show_desc()
@@ -754,13 +744,13 @@ class PalEdit():
                         an += '🏹'
             if i in pal._equipMoves:
                 self.learntMoves.insert(0, an)
-                self.learntMoves.itemconfig(0, {'bg': PalEditConfig.accent, 'fg': PalEditConfig.fg})
+                self.learntMoves.itemconfig(0, {'bg': 'lightgrey'})
                 p += 1
             elif i in PalInfo.PalLearnSet[pal.GetCodeName()]:
                 if PalInfo.PalLearnSet[pal.GetCodeName()][i] <= pal.GetLevel():
                     if not i in pal._equipMoves:
                         self.learntMoves.insert(p, an)
-                        self.learntMoves.itemconfig(p, {'bg': PalEditConfig.input_bg, 'fg': PalEditConfig.fg})
+                        self.learntMoves.itemconfig(p, {'bg': 'darkgrey'})
             else:
                 self.learntMoves.insert(tk.constants.END, an)
 
@@ -792,7 +782,7 @@ class PalEdit():
                 pp = pal.GetSuit(i)
                 sp = pt._suits[i]
                 tp = pp + sp
-                c = "#55FF55" if tp > sp else PalEditConfig.disabled
+                c = "#55FF55" if tp > sp else "#D3D3D3"
                 # Configure the spinbox range BEFORE writing the value. If the
                 # value were set first, a stale minimum left over from the
                 # previously-selected pal could silently clamp it, and a later
@@ -811,7 +801,7 @@ class PalEdit():
         else:
             
             for i in suitabilities:
-                self.suits[f"{i}_label"].config(state=tk.DISABLED, from_=0, bg=PalEditConfig.disabled)
+                self.suits[f"{i}_label"].config(state=tk.DISABLED, from_=0, bg="#D3D3D3")
                 self.suits[f"{i}_var"].set(0)
 
             self.hthstatval.config(text="n/a")
@@ -875,7 +865,7 @@ class PalEdit():
             sp = pt._suits[i]
             pp = pp - sp
             tp = pp + sp
-            c = "#55FF55" if tp > sp else PalEditConfig.disabled
+            c = "#55FF55" if tp > sp else "#D3D3D3"
             self.suits[f"{i}_label"].config(bg=c)
 
             pal.SetSuit(i, pp)
@@ -1113,9 +1103,9 @@ class PalEdit():
             self.listdisplay.insert(tk.constants.END, p.GetFullName())
 
             if p.isBoss:
-                self.listdisplay.itemconfig(tk.constants.END, {'fg': '#ff6b6b'})
+                self.listdisplay.itemconfig(tk.constants.END, {'fg': 'red'})
             elif p.isLucky:
-                self.listdisplay.itemconfig(tk.constants.END, {'fg': '#6ca8ff'})
+                self.listdisplay.itemconfig(tk.constants.END, {'fg': 'blue'})
 
         self.refresh()
 
@@ -1764,9 +1754,9 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.listdisplay.insert(i, pal.GetFullName())
 
         if pal.isBoss:
-            self.listdisplay.itemconfig(i, {'fg': '#ff6b6b'})
+            self.listdisplay.itemconfig(i, {'fg': 'red'})
         elif pal.isLucky:
-            self.listdisplay.itemconfig(i, {'fg': '#6ca8ff'})
+            self.listdisplay.itemconfig(i, {'fg': 'blue'})
 
     def togglelucky(self):
         if not self.isPalSelected():
@@ -1819,38 +1809,6 @@ Do you want to use %s's DEFAULT Scaling (%s)?
     def createWindow(self):
         root = tk.Tk()
         return root
-
-    def _apply_theme(self):
-        """Apply the modern dark palette across classic tk and ttk widgets."""
-        c = PalEditConfig
-        # tk_setPalette recolours every classic tk widget that doesn't set its
-        # own colour, so labels/buttons without an explicit fg become readable
-        # on the dark surfaces.
-        self.gui.tk_setPalette(
-            background=c.surface, foreground=c.fg,
-            activeBackground=c.accent, activeForeground=c.fg,
-            highlightBackground=c.window, highlightColor=c.accent,
-            disabledForeground=c.fg_dim, insertBackground=c.fg,
-            selectBackground=c.accent, selectForeground=c.fg,
-            troughColor=c.window)
-        self.gui.configure(background=c.window)
-        try:
-            style = ttk.Style(self.gui)
-            style.theme_use("clam")
-            style.configure(".", background=c.surface, foreground=c.fg,
-                            fieldbackground=c.input_bg, bordercolor=c.window,
-                            focuscolor=c.accent, font=(c.font, 10))
-            style.configure("TCombobox", fieldbackground=c.input_bg,
-                            background=c.input_bg, foreground=c.fg,
-                            arrowcolor=c.fg, selectbackground=c.accent)
-            style.map("TCombobox",
-                      fieldbackground=[("readonly", c.input_bg)],
-                      foreground=[("disabled", c.fg_dim)])
-            style.configure("TButton", background=c.input_bg, foreground=c.fg,
-                            bordercolor=c.window, focuscolor=c.accent)
-            style.map("TButton", background=[("active", c.accent)])
-        except Exception:
-            logger.error("Theme styling failed", exc_info=True)
 
     def resetTitle(self):
         self.gui.title(f"PalEdit v{PalEditConfig.version}")
@@ -2044,7 +2002,6 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         # save paths already backed up this session (one backup per file)
         self._session_backups = set()
         self.gui = self.createWindow()
-        self._apply_theme()
         # limit ability pickers to what each pal can legally have (Tools menu toggle)
         self.filterlegal = tk.BooleanVar(master=self.gui, value=True)
         self.resetTitle()
@@ -2123,7 +2080,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         # Attack Skills
         atkskill = tk.Frame(root, width=120, relief="groove", borderwidth=2)
         atkskill.pack(side=tk.constants.RIGHT, fill=tk.constants.Y)
-        atkLabel = tk.Label(atkskill, bg=PalEditConfig.surface, width=12, text=self.i18n['atk_lbl'],
+        atkLabel = tk.Label(atkskill, bg="darkgrey", width=12, text=self.i18n['atk_lbl'],
                             font=(PalEditConfig.font, PalEditConfig.ftsize),
                             justify="center")
         self.i18n_el['atk_lbl'] = atkLabel
@@ -2177,10 +2134,10 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.learntMoves = tk.Listbox(wazaScroll, width=30, yscrollcommand=scrollbar.set, exportselection=0)
         self.learntMoves.pack(side=tk.constants.LEFT, fill=tk.constants.X, expand=True)
 
-        removeMove = tk.Button(wazaButtons, fg=PalEditConfig.danger, text="🗑", borderwidth=1,
+        removeMove = tk.Button(wazaButtons, fg="red", text="🗑", borderwidth=1,
                                font=(PalEditConfig.font, PalEditConfig.ftsize - 2),
                                command=self.stripMove,
-                               bg=PalEditConfig.surface)
+                               bg="darkgrey")
         removeMove.pack(fill=tk.constants.BOTH, expand=True)
 
         # self.listdisplay.bind("<<ListboxSelect>>", self.onselect)
@@ -2201,11 +2158,11 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.fruitOptions.bind("<KeyRelease>", filterfruit)
         addMove = tk.Button(wazaButtons, text="➕", borderwidth=1, font=(PalEditConfig.font, PalEditConfig.ftsize - 10),
                             command=self.appendMove,
-                            bg=PalEditConfig.surface)
+                            bg="darkgrey")
         addMove.pack(side=tk.constants.RIGHT, fill=tk.constants.BOTH, expand=True)
 
         # Individual Info
-        infoview = tk.Frame(root, relief="groove", borderwidth=2, width=480, height=480, bg=PalEditConfig.surface)
+        infoview = tk.Frame(root, relief="groove", borderwidth=2, width=480, height=480, bg="darkgrey")
         infoview.pack(side=tk.constants.RIGHT, fill=tk.constants.BOTH, expand=True)
 
         dataview = tk.Frame(infoview)
@@ -2265,18 +2222,18 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         deckview = tk.Frame(dataview, width=320, relief="sunken", borderwidth=2, pady=0)
         deckview.pack(side=tk.constants.RIGHT, fill=tk.constants.BOTH, expand=True)
 
-        self.title = tk.Label(deckview, text=f"PalEdit", bg=PalEditConfig.surface, font=(PalEditConfig.font, 24), width=17)
+        self.title = tk.Label(deckview, text=f"PalEdit", bg="darkgrey", font=(PalEditConfig.font, 24), width=17)
         self.title.pack(expand=True, fill=tk.constants.BOTH)
         # double-click the name to rename the selected pal
         self.title.bind("<Double-Button-1>", lambda evt: self.editnickname())
 
-        headerframe = tk.Frame(deckview, padx=0, pady=0, bg=PalEditConfig.surface)
+        headerframe = tk.Frame(deckview, padx=0, pady=0, bg="darkgrey")
         headerframe.pack(fill=tk.constants.X)
         headerframe.grid_rowconfigure(0, weight=1)
         headerframe.grid_columnconfigure((0, 2), uniform="equal")
         headerframe.grid_columnconfigure(1, weight=1)
 
-        self.level = tk.Label(headerframe, text=f"v{PalEditConfig.version}", bg=PalEditConfig.surface,
+        self.level = tk.Label(headerframe, text=f"v{PalEditConfig.version}", bg="darkgrey",
                               font=(PalEditConfig.font, 24),
                               width=17)
         self.level.bind("<Enter>", lambda evt, num="owner": self.changetext(num))
@@ -2285,40 +2242,40 @@ Do you want to use %s's DEFAULT Scaling (%s)?
 
         minlvlbtn = tk.Button(headerframe, text="➖", borderwidth=1, font=(PalEditConfig.font, PalEditConfig.ftsize - 2),
                               command=self.takelevel,
-                              bg=PalEditConfig.surface)
+                              bg="darkgrey")
         minlvlbtn.grid(row=0, column=0, sticky="nsew")
 
         addlvlbtn = tk.Button(headerframe, text="➕", borderwidth=1, font=(PalEditConfig.font, PalEditConfig.ftsize - 2),
                               command=self.givelevel,
-                              bg=PalEditConfig.surface)
+                              bg="darkgrey")
         addlvlbtn.grid(row=0, column=2, sticky="nsew")
 
         baseinfoview = tk.Frame(deckview)
         baseinfoview.pack(fill=tk.constants.BOTH)
-        labelview = tk.Frame(baseinfoview, bg=PalEditConfig.input_bg, pady=0, padx=16)
+        labelview = tk.Frame(baseinfoview, bg="lightgrey", pady=0, padx=16)
         labelview.pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.BOTH)
 
         name = tk.Label(labelview, text=self.i18n['name_prop'], font=(PalEditConfig.font, PalEditConfig.ftsize),
-                        bg=PalEditConfig.input_bg)
+                        bg="lightgrey")
         name.pack(expand=True, fill=tk.constants.X)
         self.i18n_el['name_prop'] = name
         gender = tk.Label(labelview, text=self.i18n['gender_prop'], font=(PalEditConfig.font, PalEditConfig.ftsize),
-                          bg=PalEditConfig.input_bg,
+                          bg="lightgrey",
                           width=6, pady=6)
         self.i18n_el['gender_prop'] = gender
         gender.pack(expand=True, fill=tk.constants.X)
         rankspeed = tk.Label(labelview, text=self.i18n['rank_prop'], font=(PalEditConfig.font, PalEditConfig.ftsize),
-                             bg=PalEditConfig.input_bg)
+                             bg="lightgrey")
         self.i18n_el['rank_prop'] = rankspeed
         rankspeed.pack(expand=True, fill=tk.constants.X)
         workspeed = tk.Label(labelview, text=self.i18n['workspeed_prop'],
                              font=(PalEditConfig.font, PalEditConfig.ftsize),
-                             bg=PalEditConfig.input_bg, width=12)
+                             bg="lightgrey", width=12)
         self.i18n_el['workspeed_prop'] = workspeed
         workspeed.pack(expand=True, fill=tk.constants.X)
 
 
-        statview = tk.Frame(deckview, relief="raised", borderwidth=2, bg=PalEditConfig.surface)
+        statview = tk.Frame(deckview, relief="raised", borderwidth=2, bg="darkgrey")
         statview.pack(fill=tk.constants.X)
         statinfoview = tk.Frame(statview)
         statinfoview.pack(fill=tk.constants.X, side=tk.constants.LEFT, expand=True)
@@ -2326,23 +2283,23 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         statlabelview.pack(fill=tk.constants.X, side=tk.constants.LEFT, expand=True)
 
         hp = tk.Label(statlabelview, text=self.i18n['hp_prop'], font=(PalEditConfig.font, PalEditConfig.ftsize),
-                      bg=PalEditConfig.surface,
+                      bg="darkgrey",
                       width=10)
         self.i18n_el['hp_prop'] = hp
         hp.pack(expand=True, fill=tk.constants.X)
         mattack = tk.Label(statlabelview, text=self.i18n['mattack_prop'], font=(PalEditConfig.font, PalEditConfig.ftsize),
-                          bg=PalEditConfig.surface,
+                          bg="darkgrey",
                           width=8)
         self.i18n_el['mattack_prop'] = mattack
         mattack.pack(expand=True, fill=tk.constants.X)
         sattack = tk.Label(statlabelview, text=self.i18n['sattack_prop'], font=(PalEditConfig.font, PalEditConfig.ftsize),
-                          bg=PalEditConfig.surface,
+                          bg="darkgrey",
                           width=8)
         self.i18n_el['sattack_prop'] = sattack
         sattack.pack(expand=True, fill=tk.constants.X)
         
         defence = tk.Label(statlabelview, text=self.i18n['defence_prop'], font=(PalEditConfig.font, PalEditConfig.ftsize),
-                           bg=PalEditConfig.surface, width=8)
+                           bg="darkgrey", width=8)
         self.i18n_el['defence_prop'] = defence
         defence.pack(expand=True, fill=tk.constants.X)
         
@@ -2351,21 +2308,21 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         statvals = tk.Frame(statinfoview, width=6)
         statvals.pack(side=tk.constants.RIGHT, expand=True, fill=tk.constants.X)
 
-        self.hthstatval = tk.Label(statvals, bg=PalEditConfig.surface, text="500",
+        self.hthstatval = tk.Label(statvals, bg="darkgrey", text="500",
                                    font=(PalEditConfig.font, PalEditConfig.ftsize),
                                    justify="center")
         self.hthstatval.pack(fill=tk.constants.X)
-        self.matkstatval = tk.Label(statvals, bg=PalEditConfig.surface, text="100", font=(PalEditConfig.font, PalEditConfig.ftsize),
+        self.matkstatval = tk.Label(statvals, bg="darkgrey", text="100", font=(PalEditConfig.font, PalEditConfig.ftsize),
                                    justify="center")
         self.matkstatval.pack(fill=tk.constants.X)
-        self.satkstatval = tk.Label(statvals, bg=PalEditConfig.surface, text="100", font=(PalEditConfig.font, PalEditConfig.ftsize),
+        self.satkstatval = tk.Label(statvals, bg="darkgrey", text="100", font=(PalEditConfig.font, PalEditConfig.ftsize),
                                    justify="center")
         self.satkstatval.pack(fill=tk.constants.X)
-        self.defstatval = tk.Label(statvals, bg=PalEditConfig.surface, text="50", font=(PalEditConfig.font, PalEditConfig.ftsize),
+        self.defstatval = tk.Label(statvals, bg="darkgrey", text="50", font=(PalEditConfig.font, PalEditConfig.ftsize),
                                    justify="center")
         self.defstatval.pack(fill=tk.constants.X)
 
-        disclaim = tk.Label(deckview, relief="raised", borderwidth=2, bg=PalEditConfig.surface, text=self.i18n['msg_disclaim'],
+        disclaim = tk.Label(deckview, relief="raised", borderwidth=2, bg="darkgrey", text=self.i18n['msg_disclaim'],
                             font=(PalEditConfig.font, PalEditConfig.ftsize // 2))
         self.i18n_el['msg_disclaim'] = disclaim
         disclaim.pack(fill=tk.constants.X)
@@ -2458,7 +2415,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
                               lambda name, index, mode, sv=self.wspvar, entry=palwsp: validate_and_mark_dirty(sv,
                                                                                                               entry))
 
-        stateditview = tk.Frame(statview, bg=PalEditConfig.surface)
+        stateditview = tk.Frame(statview, bg="darkgrey")
         stateditview.pack(fill=tk.constants.X, side=tk.constants.RIGHT, expand=True)
 
 ##        def talent_hp_changed(*args):
@@ -2481,7 +2438,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
                               lambda name, index, mode, sv=self.phpvar, entry=palhps: validate_and_mark_dirty(sv,
                                                                                                               entry))
         
-        meleeframe = tk.Frame(stateditview, width=6, bg=PalEditConfig.surface)
+        meleeframe = tk.Frame(stateditview, width=6, bg="darkgrey")
         meleeframe.pack(fill=tk.constants.X)
         
         self.meleevar = tk.IntVar()
@@ -2496,7 +2453,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.meleevar.trace_add("write", lambda name, index, mode, sv=self.meleevar, entry=palmelee: validate_and_mark_dirty(sv, entry))
 
 
-        shotframe = tk.Frame(stateditview, width=6, bg=PalEditConfig.surface)
+        shotframe = tk.Frame(stateditview, width=6, bg="darkgrey")
         shotframe.pack(fill=tk.constants.X)
         
         self.shotvar = tk.IntVar()
@@ -2623,7 +2580,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
             throwawaybox = tk.Frame(suiticonbox)
             throwawaybox.pack(side=tk.constants.LEFT, anchor=tk.constants.CENTER)
             
-            self.suits[i] = tk.Label(throwawaybox, image=self.suiticons[i][1], bg=PalEditConfig.input_bg, relief="groove", borderwidth=1)
+            self.suits[i] = tk.Label(throwawaybox, image=self.suiticons[i][1], bg="lightgrey", relief="groove", borderwidth=1)
             self.suits[i].pack()
 
             v = f"{i}_var"
@@ -2632,7 +2589,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
 
             s = f"{i}_label"
             self.suits[s] = tk.Spinbox(throwawaybox, width=1, text="0",
-                                       from_=0, to=5, bg=PalEditConfig.input_bg, relief="groove",
+                                       from_=0, to=5, bg="lightgrey", relief="groove",
                                        borderwidth=1, textvariable=self.suits[v],
                                        font=(PalEditConfig.font, PalEditConfig.ftsize),
                                        command=self.setsuits)
@@ -2644,7 +2601,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
 
         framePresetsTitle = tk.Frame(framePresets)
         framePresetsTitle.pack(fill=tk.constants.BOTH)
-        presetTitle = tk.Label(framePresetsTitle, text=self.i18n['preset_lbl'], anchor='w', bg=PalEditConfig.surface,
+        presetTitle = tk.Label(framePresetsTitle, text=self.i18n['preset_lbl'], anchor='w', bg="darkgrey",
                                font=(PalEditConfig.font, PalEditConfig.ftsize), width=6,
                                height=1)
         presetTitle.pack(fill=tk.constants.BOTH)
@@ -2655,7 +2612,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
 
         framePresetsButtons1 = tk.Frame(framePresetsButtons)
         framePresetsButtons1.pack(fill=tk.constants.BOTH, expand=True)
-        preset_title1 = tk.Label(framePresetsButtons1, text=self.i18n['preset_title1'], anchor='e', bg=PalEditConfig.surface,
+        preset_title1 = tk.Label(framePresetsButtons1, text=self.i18n['preset_title1'], anchor='e', bg="darkgrey",
                                  font=(PalEditConfig.font, 13),
                                  width=9)
         preset_title1.pack(side=tk.constants.LEFT, fill=tk.constants.X)
@@ -2683,7 +2640,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
 
         framePresetsButtons2 = tk.Frame(framePresetsButtons)
         framePresetsButtons2.pack(fill=tk.constants.BOTH, expand=True)
-        preset_title2 = tk.Label(framePresetsButtons2, text=self.i18n['preset_title2'], anchor='e', bg=PalEditConfig.surface,
+        preset_title2 = tk.Label(framePresetsButtons2, text=self.i18n['preset_title2'], anchor='e', bg="darkgrey",
                                  font=(PalEditConfig.font, 13),
                                  width=9)
         preset_title2.pack(side=tk.constants.LEFT, fill=tk.constants.X)
@@ -2716,7 +2673,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         framePresetsLevel = tk.Frame(framePresetsExtras)
         framePresetsLevel.pack(fill=tk.constants.BOTH, expand=True)
         presetTitleLevel = tk.Label(framePresetsLevel, text=self.i18n['preset_title_level'], anchor='center',
-                                    bg=PalEditConfig.input_bg,
+                                    bg="lightgrey",
                                     font=(PalEditConfig.font, 13),
                                     width=20, height=1)
         presetTitleLevel.pack(side=tk.constants.LEFT, expand=False, fill=tk.constants.Y)
@@ -2736,7 +2693,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         framePresetsRank = tk.Frame(framePresetsExtras)
         framePresetsRank.pack(fill=tk.constants.BOTH, expand=True)
         presetTitleRank = tk.Label(framePresetsRank, text=self.i18n['preset_title_rank'], anchor='center',
-                                   bg=PalEditConfig.input_bg,
+                                   bg="lightgrey",
                                    font=(PalEditConfig.font, 13),
                                    width=20, height=1)
         presetTitleRank.pack(side=tk.constants.LEFT, expand=False, fill=tk.constants.Y)
@@ -2757,7 +2714,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         framePresetsAttributes = tk.Frame(framePresetsExtras)
         framePresetsAttributes.pack(fill=tk.constants.BOTH, expand=False)
         presetTitleAttributes = tk.Label(framePresetsAttributes, text=self.i18n['preset_set_attr'], anchor='center',
-                                         bg=PalEditConfig.input_bg,
+                                         bg="lightgrey",
                                          font=(PalEditConfig.font, 13), width=20, height=1)
         presetTitleAttributes.pack(side=tk.constants.LEFT,
                                    expand=False,
@@ -2779,7 +2736,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         # SOUL STATUE STUFF ⚪⚫
         soulview = tk.Frame(atkskill, relief="groove", borderwidth=2)
         soulview.pack(fill=tk.constants.X)
-        soullbl = tk.Label(soulview, text=self.i18n["soul_tooltip"], bg=PalEditConfig.surface, font=(PalEditConfig.font, PalEditConfig.ftsize))
+        soullbl = tk.Label(soulview, text=self.i18n["soul_tooltip"], bg="darkgrey", font=(PalEditConfig.font, PalEditConfig.ftsize))
         soullbl.pack(expand=True, fill=tk.constants.X, pady=0)
         self.i18n_el["soul_tooltip"] = soullbl
 
@@ -2798,7 +2755,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
 
         hpsoul = tk.Frame(soulview)
         hpsoul.pack(fill=tk.constants.X)
-        hpsoultag = tk.Label(hpsoul, width=10, text=self.i18n["health_soul_lbl"], bg=PalEditConfig.surface, font=(PalEditConfig.font, PalEditConfig.ftsize))
+        hpsoultag = tk.Label(hpsoul, width=10, text=self.i18n["health_soul_lbl"], bg="darkgrey", font=(PalEditConfig.font, PalEditConfig.ftsize))
         hpsoultag.pack(side=tk.constants.LEFT, fill=tk.constants.X, expand=True)
         self.i18n_el["health_soul_lbl"] = hpsoultag
         self.hpsoulval = tk.Label(hpsoul, width=6, text="+30%", font=(PalEditConfig.font, PalEditConfig.ftsize-4))
@@ -2808,7 +2765,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
 
         atsoul = tk.Frame(soulview)
         atsoul.pack(fill=tk.constants.X)
-        atsoultag = tk.Label(atsoul, width=10, text=self.i18n["attack_soul_lbl"], bg=PalEditConfig.surface, font=(PalEditConfig.font, PalEditConfig.ftsize))
+        atsoultag = tk.Label(atsoul, width=10, text=self.i18n["attack_soul_lbl"], bg="darkgrey", font=(PalEditConfig.font, PalEditConfig.ftsize))
         atsoultag.pack(side=tk.constants.LEFT, fill=tk.constants.X, expand=True)
         self.i18n_el["attack_soul_lbl"] = atsoultag
         self.atsoulval = tk.Label(atsoul, width=6, text="+15%", font=(PalEditConfig.font, PalEditConfig.ftsize-4))
@@ -2818,7 +2775,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
 
         dfsoul = tk.Frame(soulview)
         dfsoul.pack(fill=tk.constants.X)
-        dfsoultag = tk.Label(dfsoul, width=10, text=self.i18n["defence_soul_lbl"], bg=PalEditConfig.surface, font=(PalEditConfig.font, PalEditConfig.ftsize))
+        dfsoultag = tk.Label(dfsoul, width=10, text=self.i18n["defence_soul_lbl"], bg="darkgrey", font=(PalEditConfig.font, PalEditConfig.ftsize))
         dfsoultag.pack(side=tk.constants.LEFT, fill=tk.constants.X, expand=True)
         self.i18n_el["defence_soul_lbl"] = dfsoultag
         self.dfsoulval = tk.Label(dfsoul, width=6, text="+21%", font=(PalEditConfig.font, PalEditConfig.ftsize-4))
@@ -2828,7 +2785,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
 
         wssoul = tk.Frame(soulview)
         wssoul.pack(fill=tk.constants.X)
-        wssoultag = tk.Label(wssoul, width=10, text=self.i18n["working_soul_lbl"], bg=PalEditConfig.surface, font=(PalEditConfig.font, PalEditConfig.ftsize))
+        wssoultag = tk.Label(wssoul, width=10, text=self.i18n["working_soul_lbl"], bg="darkgrey", font=(PalEditConfig.font, PalEditConfig.ftsize))
         wssoultag.pack(side=tk.constants.LEFT, fill=tk.constants.X, expand=True)
         self.i18n_el["working_soul_lbl"] = wssoultag
         self.wssoulval = tk.Label(wssoul, width=6, text="+0%", font=(PalEditConfig.font, PalEditConfig.ftsize-4))
@@ -2840,14 +2797,14 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         frameDebug = self.frameDebug = tk.Frame(infoview, relief="flat")
         frameDebug.pack()
         frameDebug.pack_forget()
-        self.debugTitle = tk.Label(frameDebug, text='Debug:', anchor='w', bg=PalEditConfig.surface,
+        self.debugTitle = tk.Label(frameDebug, text='Debug:', anchor='w', bg="darkgrey",
                               font=(PalEditConfig.font, PalEditConfig.ftsize), width=6, height=1)
         self.debugTitle.pack(fill=tk.constants.BOTH)
-        self.storageId = tk.Label(frameDebug, text='StorageID: NULL', anchor='w', bg=PalEditConfig.surface,
+        self.storageId = tk.Label(frameDebug, text='StorageID: NULL', anchor='w', bg="darkgrey",
                                   font=(PalEditConfig.font, PalEditConfig.ftsize), width=6,
                                   height=1)
         self.storageId.pack(fill=tk.constants.BOTH)
-        self.storageSlot = tk.Label(frameDebug, text='StorageSlot: NULL', anchor='w', bg=PalEditConfig.surface,
+        self.storageSlot = tk.Label(frameDebug, text='StorageSlot: NULL', anchor='w', bg="darkgrey",
                                     font=(PalEditConfig.font, PalEditConfig.ftsize), width=6,
                                     height=1)
         self.storageSlot.pack(fill=tk.constants.BOTH)
@@ -2861,7 +2818,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         button.config(font=(PalEditConfig.font, 12))
         button.pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.BOTH)
 
-        cloneLabel = tk.Label(atkskill, bg=PalEditConfig.surface, width=12, text=self.i18n['clone_lbl'],
+        cloneLabel = tk.Label(atkskill, bg="darkgrey", width=12, text=self.i18n['clone_lbl'],
                               font=(PalEditConfig.font, PalEditConfig.ftsize),
                               justify="center")
         self.i18n_el['clone_lbl'] = cloneLabel
@@ -2882,12 +2839,12 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         # kept so loaddata can hide it for Global Palbox saves (no players)
         self.warningframe = warning
 
-        warnhdr = tk.Label(warning, width=10, text="WARNING!", bg=PalEditConfig.surface, font=(PalEditConfig.font, PalEditConfig.ftsize+2))
+        warnhdr = tk.Label(warning, width=10, text="WARNING!", bg="darkgrey", font=(PalEditConfig.font, PalEditConfig.ftsize+2))
         warnhdr.pack(fill=tk.constants.BOTH)
 
         warnstr = "Players who have not logged in for a while can break your save. If you cannot get them to join to upgrade their save data then remove them using Prune or remove their player data from the 'Players' folder while on the title screen then load the save."
 
-        warnlabel = tk.Label(warning, wrap=300, width=10, text=warnstr, bg=PalEditConfig.surface, font=(PalEditConfig.font, PalEditConfig.ftsize-6))
+        warnlabel = tk.Label(warning, wrap=300, width=10, text=warnstr, bg="darkgrey", font=(PalEditConfig.font, PalEditConfig.ftsize-6))
         warnlabel.pack(fill=tk.constants.BOTH)
         
 
