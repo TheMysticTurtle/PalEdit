@@ -162,6 +162,71 @@ for cherry-picking):
   work-suitability (and optionally soul/condensation) maxima. Note the game
   itself caps work suitability at 5 by normal means; >5 is a power-user knob.
 
+## STOP-THE-DAY STATUS (2026-07-26 end) — READ FIRST TOMORROW
+
+**PR is BLOCKED** until the work-suitability editor is finished (owner's
+call). Do not open the pull request yet.
+
+### Shipped today and deployed to PalEdit-1.0 (owner can launch now)
+session-backup, nickname-edit, palbox-add-remove, stale-warning-storage,
+attack-search, passive-search, and the critical **fix/work-suitability-
+corruption** (merged to main, exe rebuilt + deployed).
+
+### The save-corruption bug (FIXED) — what it was
+Owner's farm/ranch pals (Penking, Incineram grazing) produced nothing and
+showed no work levels. Root cause was TWO defects:
+1. `PalEntity.__init__` wrote a zero-rank entry into
+   `GotWorkSuitabilityAddRankList` for every suitability on load → opening +
+   saving injected 13 phantom entries/pal (286 for the owner's 22-pal box)
+   into a list the game leaves empty, breaking in-game work assignment.
+   FIXED: prune zero-rank entries on load; `SetSuit` creates an entry only
+   for a non-zero bonus and removes it at zero. Loading a corrupted save in
+   the new build and saving REPAIRS it (286 → 0, verified).
+2. `onselect` set each suitability spinbox value before its minimum, so a
+   stale minimum from the previous pal clamped the value; a later click wrote
+   the wrong value back (the "flip-flop"). FIXED: configure range before
+   value; `setsuits` bails while `is_onselect`.
+**Owner recovery:** open the real GlobalPalStorage.sav in the new build and
+save (game closed) — the phantom entries are pruned out. Session-backup keeps
+the pre-edit copy in a PalEdit-backups/ folder just in case.
+
+### TOMORROW — first job: the work-suitability EDITOR (finishes the PR blocker)
+Owner wants: an EXACT readout of every pal's work suitabilities AND the
+ability to fully adjust ALL of them (natural + modded, e.g. give Penking a
+ranch level it doesn't have naturally). Current UI is 13 spinboxes
+(base+added, min=species base, to=5). Needed:
+- Show, per suit, the effective level clearly (species base + AddRank bonus),
+  ideally labelled so you can SEE which are natural vs added.
+- Allow setting any suit 0..N freely (a "standard vs unrestricted" toggle like
+  the ability pickers — default caps at 5, unrestricted goes to 10 for the
+  owner's make-anything pals). Data path: `GotWorkSuitabilityAddRankList`
+  rank = desired_total − species_base (already how SetSuit-via-setsuits works;
+  just widen the range and relabel).
+- INVESTIGATE (open question): does the game actually grant a suitability the
+  pal has NO species base in, purely from a positive AddRank? If not, giving
+  Penking ranch may need a different field. Candidates seen on real pals:
+  `CurrentWorkSuitability`, `WorkSuitabilityOptionInfo`,
+  `WorkSuitabilityOverflowGrantedRankList`. Test in-game with a scratchpad
+  copy before promising the "give any pal any job" feature.
+- SEPARATE latent bug to fix while here: `PalInfo.SetType` (species change)
+  writes a `CraftSpeeds` field that real 1.0 saves DO NOT have (verified:
+  0 pals have it). It's probably a pre-1.0 leftover and may itself break work
+  calc on species-changed pals. Decide whether to stop writing CraftSpeeds
+  entirely (likely yes) — check the game reads work suitability only from
+  species data + GotWorkSuitabilityAddRankList.
+
+### TOMORROW — remaining roadmap (after the suitability editor)
+- `feature/species-browser` (#14): in-game-style popup — element + work-suit
+  filters, name search, ICON thumbnails, category buckets (obtainable via
+  DeckIndex>=0 / tower boss via TowerBoss / NPC via Human). Reuse for the
+  species selector AND the palbox list. NPCs stay (owner catches merchants).
+- `feature/stats-panel` (#18): computed standard stats near the portrait,
+  raised/lowered indicators, collapsible fine-tune section. Fold in the
+  soul/condensation "unrestricted caps" toggle (research done: souls 0-20 ok,
+  condensation 1-5 game max, work-suit cap 5 is the one to raise).
+- `feature/ui-facelift` (#19): modernize the whole layout last.
+- THEN: write CONTRIBUTIONS.md and open the PR.
+
 ## Branch workflow (agreed 2026-07-26 — SUPERSEDES all earlier roadmap notes)
 
 Goal: upstream (EternalWraith) should be able to cherry-pick features with a
