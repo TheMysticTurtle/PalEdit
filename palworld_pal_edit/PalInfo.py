@@ -326,6 +326,10 @@ class PalEntity:
         self.AddSuits["value"]["values"] = [
             x for x in self.AddSuits["value"]["values"] if x["Rank"]["value"] != 0
         ]
+        # Strip the pre-1.0 "CraftSpeeds" field if an older PalEdit wrote one;
+        # 1.0 saves never have it. Removing it on load means simply re-saving
+        # a polluted save cleans it out.
+        self._obj.pop("CraftSpeeds", None)
                 
                 
     def GetSuit(self, suit):
@@ -425,14 +429,11 @@ class PalEntity:
         self._obj['CharacterID']['value'] = ("BOSS_" if (self.isBoss or self.isLucky) and not self.IsHuman() else "") + value
         self._type = PalSpecies[value]
         self.CleanseAttacks()
-
-        if self.IsHuman(): return
-        
-        ss = copy.deepcopy(EmptySuitObject)
-        for i in ss["value"]["values"]:
-            t = i["WorkSuitability"]["value"]["value"].split("::")[1]
-            i["Rank"]["value"] = self._type._suits[t]
-        self._obj["CraftSpeeds"] = ss
+        # NOTE: pre-1.0 PalEdit also wrote a "CraftSpeeds" field here with the
+        # new species' work ranks. Palworld 1.0 saves have no such field (the
+        # game derives work suitability from species data + the
+        # GotWorkSuitabilityAddRankList bonuses), so writing it only polluted
+        # the save and could break work assignment. It is intentionally gone.
 
     def GetObject(self) -> PalObject:
         return self._type
