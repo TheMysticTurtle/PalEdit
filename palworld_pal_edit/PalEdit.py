@@ -858,7 +858,19 @@ class PalEdit():
             self.storage_mode = False
             paldata = props['worldSaveData']['value']['CharacterSaveParameterMap']['value']
             self.palguidmanager = PalInfo.PalGuid(self.data)
+        # The stale-player warning only concerns world saves (Level.sav +
+        # Players/*.sav). The Global Palbox has no players, so hide it there.
+        self._update_stale_warning()
         self.loadpal(paldata)
+
+    def _update_stale_warning(self):
+        frame = getattr(self, 'warningframe', None)
+        if frame is None:
+            return
+        if getattr(self, 'storage_mode', False):
+            frame.pack_forget()
+        elif not frame.winfo_ismapped():
+            frame.pack(fill=tk.constants.BOTH)
 
     def loadpal(self, paldata):
         logger.Space()
@@ -2715,6 +2727,8 @@ Do you want to use %s's DEFAULT Scaling (%s)?
 
         warning = tk.Frame(atkskill, relief="groove", borderwidth=2)
         warning.pack(fill=tk.constants.BOTH)
+        # kept so loaddata can hide it for Global Palbox saves (no players)
+        self.warningframe = warning
 
         warnhdr = tk.Label(warning, width=10, text="WARNING!", bg="darkgrey", font=(PalEditConfig.font, PalEditConfig.ftsize+2))
         warnhdr.pack(fill=tk.constants.BOTH)
