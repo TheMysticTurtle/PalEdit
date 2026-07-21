@@ -1,4 +1,4 @@
-import os, webbrowser, json, time, uuid, math, zipfile
+import os, webbrowser, json, time, uuid, math, zipfile, shutil
 
 import pyperclip
 
@@ -988,6 +988,31 @@ class PalEdit():
         logger.WriteLog(msg)
         messagebox.showinfo("Error", "There was an error! Your save may have issues or the tool is unable to process it. Upload your log.txt file to the support channel in our discord and ask for help.")
 
+    def backup_save(self, file):
+        """Copy the on-disk save into a PalEdit-backups folder next to it,
+        once per file per editing session, before it is first overwritten.
+
+        Returns True when it is safe to proceed with the write. A failed
+        backup aborts the save rather than risking the only good copy."""
+        if file in self._session_backups or not os.path.exists(file):
+            return True
+        try:
+            backup_dir = os.path.join(os.path.dirname(file), "PalEdit-backups")
+            os.makedirs(backup_dir, exist_ok=True)
+            stamp = datetime.now().strftime("%Y.%m.%d-%H.%M.%S")
+            dest = os.path.join(backup_dir, f"{os.path.basename(file)}.{stamp}.bak")
+            shutil.copy2(file, dest)
+            self._session_backups.add(file)
+            logger.info(f"Session backup created: {dest}")
+            return True
+        except OSError as e:
+            logger.error(f"Session backup failed for {file}", exc_info=True)
+            messagebox.showerror(
+                "Backup failed",
+                "Could not back up the save file, so nothing was written.\n\n"
+                f"{e}\n\nFree up disk space or check permissions and try again.")
+            return False
+
     def savefile(self):
         self.skilllabel.config(text=self.i18n['msg_saving_big'])
         self.gui.update()
@@ -1000,6 +1025,11 @@ class PalEdit():
         # print(file, self.filename)
         if file:
             logger.info(f"Opening file {file}")
+            # Preserve the current on-disk save before the first write of this
+            # session; abort the save entirely if the backup cannot be made.
+            if not self.backup_save(file):
+                self.skilllabel.config(text=self.i18n['msg_saving'])
+                return
             try:
                 if 'gvas_file' in self.data:
                     gvas_file = self.data['gvas_file']
@@ -1671,6 +1701,8 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.debug = "false"
         self.editindex = -1
         self.filename = ""
+        # save paths already backed up this session (one backup per file)
+        self._session_backups = set()
         self.gui = self.createWindow()
         # limit ability pickers to what each pal can legally have (Tools menu toggle)
         self.filterlegal = tk.BooleanVar(master=self.gui, value=True)
