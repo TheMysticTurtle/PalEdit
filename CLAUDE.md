@@ -129,59 +129,66 @@ needs a stub logger.
   `event_generate("<Return>")` is flaky without real focus — test via the
   direct code paths (`changeskill(n, code)`, `attacks[n].set + changeattack`).
 
-## Owner feedback round 2 (2026-07-20, IN PROGRESS this session)
+## Branch workflow (agreed 2026-07-26 — SUPERSEDES all earlier roadmap notes)
 
-1. Attack picker: **toggle between "standard" (learnset-only) and
-   "fruit-teachable"** — checkbutton inside the picker popup; the skill-fruit
-   combobox always uses the fruit-teachable set.
-2. **Species browser popup** (like the in-game search): filter by element
-   type and work suitability + name search, rows show the pal's ICON next to
-   its name (ttk.Treeview with thumbnail images, subsample cached). Only
-   catchable pals (psp pal_deck_index >= 0 → emit "DeckIndex" in per-pal
-   files) + tower bosses ("TowerBoss" from is_tower_boss). Open via 🔍 button
-   next to the species combobox; selecting applies via the same
-   changespeciestype path.
-3. **"Add to Global" / working clone in palbox mode**: clonepal is guarded
-   off in storage_mode. Implement: find first SaveParameterArray slot with
-   CharacterID "None", deepcopy the selected pal's SaveParameter into it,
-   PRESERVE the empty slot's original SlotId (else two pals share a slot),
-   new InstanceId GUID, then loaddata(self.data) to refresh. "Add random
-   creature" = clone + change species afterwards.
+Goal: upstream (EternalWraith) should be able to cherry-pick features with a
+clear record; owner gets solid fallback points if a feature breaks.
 
-## Owner feedback 2026-07-20 (TODO next session — verbatim requests)
+- `main` — integration line the owner's exe is built from. Merge finished
+  features with `--no-ff` so each feature is one visible bubble.
+- `base/palworld-1.0` — marker at the 1.0 core update (a13940f).
+- `feature/<name>` — one branch per feature, branched from current main,
+  self-contained commits with PR-quality messages. Test on scratchpad save
+  copies BEFORE merging. Keep the branch after merge (cherry-pick record).
+- When everything ships: write `CONTRIBUTIONS.md` mapping every feature →
+  branch/commits with a summary (the "small document" for the upstream PR).
+- Quality bar: industry best practice, no corner-cutting, comment the code,
+  fix genuinely-out-of-place things when touched — without breaking core.
 
-1. **Attacks**: "abilities still aren't filtered down to what that pal can
-   use? … it should show any that can be applied to them." They ARE filtered
-   (foreign uniques removed) but the list is still ~147 long because skill
-   fruits legally teach any non-unique move. Owner expects a tighter list —
-   add a tiered filter, probably default to **learnset-only** (what the pal
-   naturally learns, `PalLearnSet`), with "obtainable (fruits)" and "all" as
-   escalations. ALSO: confirm the owner relaunched the NEW exe — if they
-   tested the old build the filtering wasn't there at all.
-2. **Passives**: "only the ones for that pal" — verify/tighten the legal set
-   (rollable ∪ innate; maybe they want it even tighter — ask or observe).
-   **Keep all tier variants pickable** (e.g. Legs_up_1/2/3 families — the
-   "different levels" of a passive), and **show each passive's stat buff** in
-   the picker — `PalInfo.PassiveDescriptions[code]` exists; show it as a
-   second column / detail line / tooltip in open_ability_search rows.
-3. **Species selector**: currently lists all 834 entries incl. humans,
-   RAID_/SUMMON_/Quest_/Oilrig junk. Filter to catchable pals + tower bosses.
-   Best signal: psp `pal_deck_index >= 0` = catchable (emit as e.g.
-   `DeckIndex` via update_data.py), `is_tower_boss` for GYM_. Keep the
-   current species in the list if the loaded pal is something exotic.
+## Feature roadmap (owner's list, 2026-07-26 — OVERRIDES earlier notes where they differ)
 
-## Remaining polish ideas
+1. `feature/session-backup` — automatic backup of the loaded .sav, once per
+   edit session, before the first write.
+2. `feature/palbox-add-remove` — add NEW pals to the Global Palbox (default
+   species: a turtle pal — owner is "The Mystic Testudine", quiet nod), fix
+   clone in storage mode (find CharacterID=="None" slot, deepcopy selected
+   SaveParameter in, PRESERVE target slot's SlotId, fresh InstanceId GUID,
+   loaddata to refresh), and delete (reset slot back to a None template).
+3. `feature/nickname-edit` — rename pals (1.0 also has FilteredNickName +
+   LastNickNameModifierPlayerUid — check whether they must be set together).
+4. `feature/species-browser` — in-game-style browser for BOTH the species
+   selector and the palbox list: element + work-suitability filters, name
+   search, icon thumbnails next to names (analyze the in-game filter menu
+   structure for layout). Category toggle: **obtainable pals / boss pals /
+   NPCs** — NPCs STAY available (owner: you can catch merchants and use them
+   in base!), just sorted into their own bucket. DeckIndex>=0 = obtainable,
+   TowerBoss flag, Human flag = NPC bucket.
+5. `feature/attack-search` — same browser aesthetic: filter by element, sort
+   by damage, 3-tier toggle: learnset-only / + fruit-teachable / ALL attacks.
+   Never hard-restrict — "make it clear where the standard and whacko line
+   stands", don't stop anyone from going whacko.
+6. `feature/passive-search` — grouped by effect type with a blurb of what
+   each adjusts (PassiveDescriptions), updates the visual attribute
+   indicators, toggle natural-for-this-pal / all passives.
+7. Rank/soul caps: UI caps enhancement at 5 but owner says pals reach 10 via
+   mutations — research the real 1.0 caps in game data (psp) and raise;
+   toggle standard vs unrestricted attribute editing.
+8. `feature/stats-panel` — near the portrait: computed standard attributes
+   for the level, indicators for raised/lowered stats, collapsible detailed
+   section for fine-tuning breeding-relevant values.
+9. `feature/ui-facelift` — modernize the whole UI last ("forgotten 2005
+   software"), free rein on layout.
+10. RESEARCH: upstream's "players who haven't joined in a while can break
+    your save" warning — likely about Level.sav worlds referencing missing
+    Players/*.sav; determine if it applies at all to GlobalPalStorage-only
+    editing (owner suspects stale; verify and document).
 
-1. **Species swap** (works today, verified on a copy: Caprity→WorldTreeDragon
-   persisted, suits + moves auto-cleansed): recompute MaxHP on swap, maybe
-   auto-fill EquipWaza from new learnset; gender-locked species warning.
-2. **UI redo "a bit"**: group stat/skill panels, search box over pal list.
-   A web UI is a different project — don't start casually.
-3. Breeding-inherited passives make "strictly legal" fuzzy — current
-   "obtainable" definition (rollable ∪ innate) is the sane default.
+Owner explicitly does NOT want upstream's open-issue backlog solved — only
+this list. Palworld Save Pal (oMaN-Rod, open source) may be consulted for
+implementation insight, but PalEdit stays streamlined and compact.
 
 ## Publishing
 
-Repo intended for the owner's GitHub (github.com/TheMysticTestudine). Upstream
-remote kept as `upstream` (EternalWraith/PalEdit). Owner's Nexus/Vortex flow
-unchanged — they launch the local exe, not a download.
+Owner publishes via GitHub Desktop (repo folder renamed src→PalEdit so the
+default repo name is right). Upstream remote = `upstream`. Owner's
+Nexus/Vortex flow unchanged — they launch the local exe, not a download.
