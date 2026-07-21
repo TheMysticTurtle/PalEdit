@@ -56,3 +56,12 @@ public 1.0 editor *palworld-save-pal* to confirm the correct 1.0 field model.
   moves to every pal. `MasteredWaza` now holds only moves taught beyond the
   natural learnset (matching the game); the displayed move pool is derived and
   never written. Previously polluted lists are cleaned on load.
+- Remove the pre-1.0 `Talent_Melee` IV. 1.0 pals have a single attack IV
+  (`Talent_Shot`); the melee IV was dropped. It was being added to every pal
+  on load. It is now only touched on legacy saves that already have it.
+
+With the above, opening a 1.0 save and saving it back without editing anything
+is now a no-op: a field-by-field diff of every pal shows nothing added,
+removed, or changed. Previously each such open/save injected `CraftSpeeds`,
+zero-rank work-suitability entries, learnset moves into `MasteredWaza`, and
+`Talent_Melee` — which is what corrupted pals.
