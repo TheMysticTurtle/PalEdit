@@ -20,6 +20,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter import messagebox
+from tkinter import simpledialog
 
 from datetime import datetime
 
@@ -1208,6 +1209,24 @@ Do you want to use %s's DEFAULT Scaling (%s)?
             self.defstatval.config(text=calc["DEF"])
 
 
+    def editnickname(self):
+        if not self.isPalSelected():
+            return
+        i = int(self.listdisplay.curselection()[0])
+        pal = self.FilteredPals()[i]
+
+        current = "" if pal.GetNickname() == pal.GetName() else pal.GetNickname()
+        answer = simpledialog.askstring(
+            "Rename Pal",
+            "Nickname (leave blank to clear and use the species name):",
+            initialvalue=current, parent=self.gui)
+        if answer is None:  # user cancelled
+            return
+        pal.SetNickname(answer.strip())
+        # nickname shows in both the list (GetFullName) and the title label
+        self.updateDisplay()
+        self.refresh(i)
+
     def takelevel(self):
         if not self.isPalSelected():
             return
@@ -1919,6 +1938,8 @@ Do you want to use %s's DEFAULT Scaling (%s)?
 
         self.title = tk.Label(deckview, text=f"PalEdit", bg="darkgrey", font=(PalEditConfig.font, 24), width=17)
         self.title.pack(expand=True, fill=tk.constants.BOTH)
+        # double-click the name to rename the selected pal
+        self.title.bind("<Double-Button-1>", lambda evt: self.editnickname())
 
         headerframe = tk.Frame(deckview, padx=0, pady=0, bg="darkgrey")
         headerframe.pack(fill=tk.constants.X)
