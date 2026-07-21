@@ -727,6 +727,20 @@ class PalEntity:
     def GetNickname(self):
         return self.GetName() if self._nickname == "" else self._nickname
 
+    def SetNickname(self, value):
+        """Set (or clear, with "") the pal's custom name.
+
+        Writes both NickName and, in Palworld 1.0, FilteredNickName — the
+        game shows the filtered copy, so they must stay in sync. Creating
+        either key when absent keeps older/world saves working too."""
+        value = value or ""
+        self._nickname = value
+        for key in ("NickName", "FilteredNickName"):
+            if key in self._obj:
+                self._obj[key]['value'] = value
+            elif value != "" or key == "NickName":
+                self._obj[key] = {'id': None, 'value': value, 'type': 'StrProperty'}
+
     def GetFullName(self):
         return self.GetObject().GetName() + (" 💀" if self.isBoss else "") + (
             " ✨" if self.isLucky else "") + (f" - '{self._nickname}'" if not self._nickname == "" else "")
