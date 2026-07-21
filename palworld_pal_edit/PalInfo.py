@@ -257,9 +257,11 @@ class PalEntity:
             self._talent_hp = 0  # we set 0, so if its not changed it should be removed by the game again.
         self._talent_hp = self._obj['Talent_HP']['value']["value"]
 
-        if not "Talent_Melee" in self._obj:
-            self._obj['Talent_Melee'] = copy.deepcopy(EmptyTalentObject)
-        self._melee = self._obj['Talent_Melee']['value']["value"]
+        # Palworld 1.0 removed the separate melee attack IV — a pal has one
+        # attack IV, Talent_Shot. Only pre-1.0 saves carry Talent_Melee; never
+        # add it (that pollutes 1.0 saves for every pal on open+save).
+        self._has_melee = "Talent_Melee" in self._obj
+        self._melee = self._obj['Talent_Melee']['value']["value"] if self._has_melee else 0
 
         if not "Talent_Shot" in self._obj:
             self._obj['Talent_Shot'] = copy.deepcopy(EmptyTalentObject)
@@ -453,7 +455,9 @@ class PalEntity:
         #self._obj['CraftSpeed']['value'] = self._workspeed = value
 
     def SetAttack(self, mval, rval):
-        self._obj['Talent_Melee']['value']["value"] = self._melee = mval
+        self._melee = mval
+        if self._has_melee:  # only persist melee on legacy saves that have it
+            self._obj['Talent_Melee']['value']["value"] = mval
         self._obj['Talent_Shot']['value']["value"] = self._ranged = rval
 
     def GetTalentHP(self):
@@ -608,10 +612,14 @@ class PalEntity:
         print("%s MaxHP: %s -> %s" % (self.GetFullName(), old_hp, new_hp))
 
     def GetAttackMelee(self):
-        return self._melee
+        # 1.0 pals have no melee IV; the attack stat uses Talent_Shot, so
+        # mirror it here to keep CalculateIngameStats correct.
+        return self._melee if self._has_melee else self._ranged
 
     def SetAttackMelee(self, value):
-        self._obj['Talent_Melee']['value']["value"] = self._melee = value
+        self._melee = value
+        if self._has_melee:  # never create Talent_Melee on a 1.0 save
+            self._obj['Talent_Melee']['value']["value"] = value
 
     def GetAttackRanged(self):
         return self._ranged
