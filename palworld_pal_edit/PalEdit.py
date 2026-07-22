@@ -1465,6 +1465,138 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.handleMaxHealthUpdates(pal)
         self.refresh(i)
 
+    # ------------------------------------------------------------------
+    # Custom passive-skill presets (build named sets, stamp onto pals)
+    # ------------------------------------------------------------------
+    def _presets_path(self):
+        return os.path.join(os.path.expanduser("~"), ".paledit_passive_presets.json")
+
+    def load_presets(self):
+        try:
+            with open(self._presets_path(), encoding="utf-8") as f:
+                data = json.load(f)
+                return data if isinstance(data, dict) else {}
+        except Exception:
+            return {}
+
+    def save_presets(self, presets):
+        try:
+            with open(self._presets_path(), "w", encoding="utf-8") as f:
+                json.dump(presets, f, indent=2)
+            return True
+        except Exception:
+            logger.error("Could not save passive presets", exc_info=True)
+            messagebox.showerror("Presets", "Could not save presets to your home folder.")
+            return False
+
+    def apply_preset(self, name=None):
+        if not self.isPalSelected():
+            return
+        name = name or self.presetvar.get()
+        presets = self.load_presets()
+        if name not in presets:
+            return
+        codes = [c for c in presets[name] if c in PalInfo.PalPassives][:4]
+        i = int(self.listdisplay.curselection()[0])
+        pal = self.FilteredPals()[i]
+        pal._skills[:] = list(codes)  # PassiveSkillList (reference)
+        self.refresh(i)
+
+    def refresh_preset_list(self):
+        names = sorted(self.load_presets())
+        self.presetdrop['values'] = names
+        if names and self.presetvar.get() not in names:
+            self.presetvar.set(names[0])
+
+    def open_preset_manager(self):
+        presets = self.load_presets()
+        top = tk.Toplevel(self.gui)
+        top.title("Passive Presets")
+        top.transient(self.gui)
+        top.geometry("380x330")
+
+        # passive display names (sorted) for the four pickers
+        names = sorted(n for c, n in PalInfo.PalPassives.items()
+                       if c not in ("NONE", "UNKNOWN", "None", "Unknown"))
+        name_to_code = {}
+        for c, n in PalInfo.PalPassives.items():
+            name_to_code.setdefault(n, c)
+        options = ["(none)"] + names
+
+        tk.Label(top, text="Existing presets:", font=(PalEditConfig.font, PalEditConfig.ftsize - 6)
+                 ).pack(anchor="w", padx=6, pady=(6, 0))
+        listframe = tk.Frame(top)
+        listframe.pack(fill=tk.constants.X, padx=6)
+        plist = tk.Listbox(listframe, height=4, font=(PalEditConfig.font, PalEditConfig.ftsize - 8))
+        plist.pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.X)
+        for n in sorted(presets):
+            plist.insert(tk.constants.END, n)
+
+        def delete_selected():
+            sel = plist.curselection()
+            if not sel:
+                return
+            data = self.load_presets()
+            data.pop(plist.get(sel[0]), None)
+            self.save_presets(data)
+            plist.delete(sel[0])
+            self.refresh_preset_list()
+
+        tk.Button(listframe, text="🗑", command=delete_selected,
+                  font=(PalEditConfig.font, PalEditConfig.ftsize - 8)).pack(side=tk.constants.RIGHT)
+
+        tk.Label(top, text="New / update preset:", font=(PalEditConfig.font, PalEditConfig.ftsize - 6)
+                 ).pack(anchor="w", padx=6, pady=(8, 0))
+        nameframe = tk.Frame(top)
+        nameframe.pack(fill=tk.constants.X, padx=6)
+        tk.Label(nameframe, text="Name:", font=(PalEditConfig.font, PalEditConfig.ftsize - 8)).pack(side=tk.constants.LEFT)
+        namevar = tk.StringVar()
+        tk.Entry(nameframe, textvariable=namevar, font=(PalEditConfig.font, PalEditConfig.ftsize - 8)
+                 ).pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.X)
+
+        slotvars = [tk.StringVar(value="(none)") for _ in range(4)]
+        for si, sv in enumerate(slotvars):
+            row = tk.Frame(top)
+            row.pack(fill=tk.constants.X, padx=6, pady=1)
+            tk.Label(row, text=f"Slot {si + 1}:", width=6, anchor="w",
+                     font=(PalEditConfig.font, PalEditConfig.ftsize - 8)).pack(side=tk.constants.LEFT)
+            ttk.Combobox(row, textvariable=sv, values=options,
+                         font=(PalEditConfig.font, PalEditConfig.ftsize - 8)
+                         ).pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.X)
+
+        def load_into_editor(*_):
+            sel = plist.curselection()
+            if not sel:
+                return
+            nm = plist.get(sel[0])
+            namevar.set(nm)
+            codes = self.load_presets().get(nm, [])
+            for si in range(4):
+                code = codes[si] if si < len(codes) else None
+                slotvars[si].set(PalInfo.PalPassives.get(code, "(none)"))
+        plist.bind("<<ListboxSelect>>", load_into_editor)
+
+        def save_preset():
+            nm = namevar.get().strip()
+            if not nm:
+                messagebox.showerror("Presets", "Give the preset a name.")
+                return
+            codes = []
+            for sv in slotvars:
+                n = sv.get()
+                if n and n != "(none)" and n in name_to_code:
+                    codes.append(name_to_code[n])
+            data = self.load_presets()
+            data[nm] = codes
+            if self.save_presets(data):
+                self.refresh_preset_list()
+                top.destroy()
+
+        tk.Button(top, text="Save preset", command=save_preset,
+                  font=(PalEditConfig.font, PalEditConfig.ftsize - 6)).pack(pady=8)
+        top.grab_set()
+        return "break"
+
     def open_stats_detail(self):
         """A clear breakdown of a pal's stats and potentials: computed combat
         stats vs the level standard, IVs (breeding), souls and condensation."""
@@ -2916,6 +3048,20 @@ Do you want to use %s's DEFAULT Scaling (%s)?
                                height=1)
         presetTitle.pack(fill=tk.constants.BOTH)
         self.i18n_el['preset_lbl'] = presetTitle
+
+        # custom named passive presets: pick one and stamp it, or manage them
+        customPresetRow = tk.Frame(framePresets)
+        customPresetRow.pack(fill=tk.constants.X)
+        self.presetvar = tk.StringVar()
+        self.presetdrop = ttk.Combobox(customPresetRow, textvariable=self.presetvar,
+                                       state="readonly", width=10,
+                                       font=(PalEditConfig.font, PalEditConfig.ftsize - 8))
+        self.presetdrop.pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.X)
+        tk.Button(customPresetRow, text="Apply", command=self.apply_preset,
+                  font=(PalEditConfig.font, PalEditConfig.ftsize - 8)).pack(side=tk.constants.LEFT)
+        tk.Button(customPresetRow, text="Manage…", command=self.open_preset_manager,
+                  font=(PalEditConfig.font, PalEditConfig.ftsize - 8)).pack(side=tk.constants.LEFT)
+        self.refresh_preset_list()
 
         framePresetsButtons = tk.Frame(framePresets, relief="groove", borderwidth=4)
         framePresetsButtons.pack(fill=tk.constants.BOTH, expand=True)
