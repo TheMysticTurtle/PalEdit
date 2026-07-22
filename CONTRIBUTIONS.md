@@ -30,11 +30,12 @@ individually.
 - Pal-list filter bar: name search, element filter, and a category toggle
   (Natural / Tower Bosses / Unobtainable / NPCs), keeping catchable merchants
   and other NPCs visible and grouped rather than hidden.
-- Searchable species browser (from the species selector): name/code search,
-  element and category filters, and a multi-toggle work-suitability filter to
-  find species with a base in one or more work types. Rows show the code
-  alongside the name so catchable NPCs/merchants are identifiable by their
-  real names.
+- Searchable species browser, opened from the species selector button (which
+  replaces the long scrolling dropdown): name/code search, element and
+  category filters, a multi-toggle work-suitability filter (find species with
+  a base in one or more work types), and an NPC-type filter (Merchant, Hunter,
+  Believer, Police, Scientist, Soldier, etc.). Rows show the code alongside
+  the name so catchable NPCs/merchants are identifiable by their real names.
 - Hide the stale-player warning when editing the Global Palbox, where it does
   not apply.
 
