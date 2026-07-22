@@ -28,8 +28,13 @@ individually.
 - Automatic save backup: the loaded save is copied to a `PalEdit-backups`
   folder before the first write of each editing session.
 - Pal-list filter bar: name search, element filter, and a category toggle
-  (obtainable pals / bosses & towers / NPCs & humans), keeping catchable
-  merchants and other NPCs visible and grouped rather than hidden.
+  (Natural / Tower Bosses / Unobtainable / NPCs), keeping catchable merchants
+  and other NPCs visible and grouped rather than hidden.
+- Searchable species browser (from the species selector): name/code search,
+  element and category filters, and a multi-toggle work-suitability filter to
+  find species with a base in one or more work types. Rows show the code
+  alongside the name so catchable NPCs/merchants are identifiable by their
+  real names.
 - Hide the stale-player warning when editing the Global Palbox, where it does
   not apply.
 
