@@ -1276,9 +1276,44 @@ Do you want to use %s's DEFAULT Scaling (%s)?
             filtered = filter(GetMyPals, self.palbox)
             filterlist = list(filtered)
 
+        filterlist = self._apply_pal_filters(filterlist)
         filterlist.sort(key=lambda e: e.GetName())
-        
+
         return filterlist
+
+    # category buckets for the pal-list filter
+    PAL_CATEGORIES = ("All", "Obtainable", "Bosses & Towers", "NPCs & Humans")
+
+    def _apply_pal_filters(self, pals):
+        """Filter the pal list by the search box, element, and category
+        controls. Returns all pals unchanged until the filter bar is built."""
+        if getattr(self, 'pal_search', None) is None:
+            return pals
+        text = self.pal_search.get().strip().lower()
+        element = self.pal_element.get()
+        category = self.pal_category.get()
+        if not text and element == "All" and category == "All":
+            return pals
+
+        out = []
+        for p in pals:
+            if text and not any(text in s.lower() for s in
+                                (p.GetName(), p.GetNickname(), p.GetCodeName())):
+                continue
+            if element != "All" and element not in (p.GetPrimary(), p.GetSecondary()):
+                continue
+            if category != "All":
+                obj = p.GetObject()
+                is_boss = p.isBoss or getattr(obj, "_tower_boss", False) \
+                    or any(k in p.GetCodeName() for k in ("BOSS_", "GYM_", "RAID_"))
+                if category == "Obtainable" and not (getattr(obj, "_deck_index", -1) >= 0 and not p.IsHuman()):
+                    continue
+                if category == "Bosses & Towers" and not is_boss:
+                    continue
+                if category == "NPCs & Humans" and not p.IsHuman():
+                    continue
+            out.append(p)
+        return out
 
     def updatestats(self):
         if not self.isPalSelected():
@@ -2004,6 +2039,10 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.gui = self.createWindow()
         # limit ability pickers to what each pal can legally have (Tools menu toggle)
         self.filterlegal = tk.BooleanVar(master=self.gui, value=True)
+        # pal-list filter state (name search / element / category)
+        self.pal_search = tk.StringVar(master=self.gui, value="")
+        self.pal_element = tk.StringVar(master=self.gui, value="All")
+        self.pal_category = tk.StringVar(master=self.gui, value="All")
         self.resetTitle()
         self.palguidmanager: PalGuid = None
         self.is_onselect = False
@@ -2069,6 +2108,26 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.playerguid = tk.Label(scrollview, text="-")
         self.playerguid.config(font=(PalEditConfig.font, 7))
         self.playerguid.pack()
+
+        # --- pal-list filter bar ---
+        def apply_pal_filter(*_):
+            if self.current.get():  # only once a save is loaded
+                self.updateDisplay()
+        filterbar = tk.Frame(scrollview)
+        filterbar.pack(fill=tk.constants.X)
+        searchbox = tk.Entry(filterbar, textvariable=self.pal_search,
+                             font=(PalEditConfig.font, PalEditConfig.ftsize - 8))
+        searchbox.pack(fill=tk.constants.X)
+        searchbox.bind("<KeyRelease>", apply_pal_filter)
+        dropframe = tk.Frame(scrollview)
+        dropframe.pack(fill=tk.constants.X)
+        elements = ["All"] + [e for e in PalInfo.PalElements if e != "None"]
+        elemdrop = tk.OptionMenu(dropframe, self.pal_element, *elements, command=apply_pal_filter)
+        elemdrop.config(font=(PalEditConfig.font, PalEditConfig.ftsize - 10), width=6)
+        elemdrop.pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.X)
+        catdrop = tk.OptionMenu(dropframe, self.pal_category, *self.PAL_CATEGORIES, command=apply_pal_filter)
+        catdrop.config(font=(PalEditConfig.font, PalEditConfig.ftsize - 10), width=8)
+        catdrop.pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.X)
 
         scrollbar = tk.Scrollbar(scrollview)
         scrollbar.pack(side=tk.constants.LEFT, fill=tk.constants.Y)
