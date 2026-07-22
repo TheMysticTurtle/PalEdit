@@ -778,7 +778,6 @@ class PalEdit():
                 pp = pal.GetSuit(i)
                 sp = pt._suits[i]
                 tp = pp + sp
-                c = "#55FF55" if tp > sp else "#D3D3D3"
                 # Configure the spinbox range BEFORE writing the value. If the
                 # value were set first, a stale minimum left over from the
                 # previously-selected pal could silently clamp it, and a later
@@ -786,7 +785,7 @@ class PalEdit():
                 # "flipflop" that corrupted work suitabilities across pals.
                 self.suits[f"{i}_label"].config(
                     state=(tk.NORMAL if sp > 0 else tk.DISABLED),
-                    from_=sp, to=max(5, tp), bg=c)
+                    from_=sp, to=self.SUIT_HARD_MAX, bg=self._suit_colour(tp, sp))
                 self.suits[f"{i}_var"].set(tp)
 
             calc = pal.CalculateIngameStats()
@@ -861,8 +860,7 @@ class PalEdit():
             sp = pt._suits[i]
             pp = pp - sp
             tp = pp + sp
-            c = "#55FF55" if tp > sp else "#D3D3D3"
-            self.suits[f"{i}_label"].config(bg=c)
+            self.suits[f"{i}_label"].config(bg=self._suit_colour(tp, sp))
 
             pal.SetSuit(i, pp)
 
@@ -1287,6 +1285,21 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         "OilExtraction": "Oil", "ProductMedicine": "Medicine", "Cool": "Cooling",
         "Transport": "Transport", "MonsterFarm": "Ranch",
     }
+
+    # work-suitability spinbox limits: green up to the normal in-game cap,
+    # red beyond it (mutation/cheat territory), hard-capped at 10
+    SUIT_NORMAL_MAX = 5
+    SUIT_HARD_MAX = 10
+
+    @staticmethod
+    def _suit_colour(total, base):
+        """Grey at/below the species base, green when raised within the
+        normal cap, red in the ridiculous (>5) range."""
+        if total <= base:
+            return "#D3D3D3"
+        if total <= PalEdit.SUIT_NORMAL_MAX:
+            return "#55FF55"
+        return "#FF6B6B"
 
     # NPC faction/role buckets, matched by codename keyword (first hit wins)
     NPC_TYPES = ("Merchant", "Believer", "Police", "Hunter", "Scientist",
@@ -2814,7 +2827,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
 
             s = f"{i}_label"
             self.suits[s] = tk.Spinbox(throwawaybox, width=1, text="0",
-                                       from_=0, to=5, bg="lightgrey", relief="groove",
+                                       from_=0, to=self.SUIT_HARD_MAX, bg="lightgrey", relief="groove",
                                        borderwidth=1, textvariable=self.suits[v],
                                        font=(PalEditConfig.font, PalEditConfig.ftsize),
                                        command=self.setsuits)
