@@ -1465,6 +1465,68 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.handleMaxHealthUpdates(pal)
         self.refresh(i)
 
+    def open_stats_detail(self):
+        """A clear breakdown of a pal's stats and potentials: computed combat
+        stats vs the level standard, IVs (breeding), souls and condensation."""
+        if not self.isPalSelected():
+            return "break"
+        i = int(self.listdisplay.curselection()[0])
+        pal = self.FilteredPals()[i]
+        if pal.IsHuman() or pal.IsTower():
+            messagebox.showinfo("Stats", "Stat breakdown is only available for pals.")
+            return "break"
+
+        top = tk.Toplevel(self.gui)
+        top.title(f"Stats — {pal.GetFullName()}")
+        top.transient(self.gui)
+        top.geometry("360x470")
+        f = PalEditConfig.font
+
+        tk.Label(top, text=f"{pal.GetNickname()}   Lv {pal.GetLevel()}   {pal.GetName()}",
+                 font=(f, PalEditConfig.ftsize - 4)).pack(pady=6)
+
+        cur = pal.CalculateIngameStats()
+        base = pal.CalculateIngameStats(baseline=True)
+
+        def section(title):
+            lf = tk.LabelFrame(top, text=title, font=(f, PalEditConfig.ftsize - 9))
+            lf.pack(fill=tk.constants.X, padx=8, pady=3)
+            return lf
+
+        def grid_row(parent, r, cols, widths, bold=False, colours=None):
+            for c, txt in enumerate(cols):
+                fg = (colours or {}).get(c, "black")
+                tk.Label(parent, text=txt, width=widths[c], anchor="w", fg=fg,
+                         font=(f, PalEditConfig.ftsize - 8, "bold" if bold else "normal")
+                         ).grid(row=r, column=c, sticky="w", padx=2)
+
+        cf = section("Combat stats  (current vs level standard)")
+        grid_row(cf, 0, ("Stat", "Current", "Standard", "Δ"), (11, 8, 8, 6), bold=True)
+        for r, (label, key) in enumerate((("HP", "HP"), ("Attack", "PHY"), ("Defense", "DEF")), 1):
+            d = cur[key] - base[key]
+            dtxt = f"+{d}" if d > 0 else (str(d) if d < 0 else "—")
+            col = {3: ("#2b8a3e" if d > 0 else ("#c92a2a" if d < 0 else "black"))}
+            grid_row(cf, r, (label, str(cur[key]), str(base[key]), dtxt), (11, 8, 8, 6), colours=col)
+
+        vf = section("IVs / Talents  (0-100, inherited in breeding)")
+        for r, (label, val) in enumerate((("HP", pal.GetTalentHP()),
+                                          ("Attack", pal.GetAttackRanged()),
+                                          ("Defense", pal.GetDefence()))):
+            grid_row(vf, r, (label, str(val)), (11, 8))
+
+        sf = section("Souls & condensation")
+        for r, (label, val) in enumerate((("Soul HP", pal.GetRankHP()),
+                                          ("Soul Attack", pal.GetRankAttack()),
+                                          ("Soul Defense", pal.GetRankDefence()),
+                                          ("Soul Work", pal.GetRankWorkSpeed()),
+                                          ("Condensation", f"{pal.GetRank()} of 5"))):
+            grid_row(sf, r, (label, str(val)), (13, 8))
+
+        tk.Button(top, text="Close", command=top.destroy,
+                  font=(f, PalEditConfig.ftsize - 6)).pack(pady=6)
+        top.grab_set()
+        return "break"
+
     def changespeciestype(self, evt):
         if not self.isPalSelected():
             return
@@ -2563,6 +2625,12 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.defstatval = tk.Label(statvals, bg="darkgrey", text="50", font=(PalEditConfig.font, PalEditConfig.ftsize),
                                    justify="center")
         self.defstatval.pack(fill=tk.constants.X)
+
+        # detailed stat / potential breakdown popup
+        statdetailbtn = tk.Button(statview, text="📊 Details", borderwidth=1,
+                                  font=(PalEditConfig.font, PalEditConfig.ftsize - 8),
+                                  command=self.open_stats_detail)
+        statdetailbtn.pack(side=tk.constants.BOTTOM, fill=tk.constants.X)
 
         disclaim = tk.Label(deckview, relief="raised", borderwidth=2, bg="darkgrey", text=self.i18n['msg_disclaim'],
                             font=(PalEditConfig.font, PalEditConfig.ftsize // 2))
