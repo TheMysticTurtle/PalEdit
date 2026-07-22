@@ -27,6 +27,9 @@ individually.
   with a per-passive effect description and a natural-only / all toggle.
 - Automatic save backup: the loaded save is copied to a `PalEdit-backups`
   folder before the first write of each editing session.
+- Pal-list filter bar: name search, element filter, and a category toggle
+  (obtainable pals / bosses & towers / NPCs & humans), keeping catchable
+  merchants and other NPCs visible and grouped rather than hidden.
 - Hide the stale-player warning when editing the Global Palbox, where it does
   not apply.
 
