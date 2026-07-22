@@ -13,6 +13,34 @@
 
 </div>
 
+---
+
+<div align="center">
+
+# 🎉 Now updated for Palworld 1.0! 🐢
+
+**A community fork of [EternalWraith's PalEdit](https://github.com/EternalWraith/PalEdit), rebuilt for the Palworld 1.0 save format** — with Global Palbox editing, save-safe writing, and a stack of quality-of-life features.
+
+</div>
+
+## ✨ What's new in the 1.0 update
+
+- 🐣 **Full Palworld 1.0 support** — reads & writes the new save format, loads the **Global Palbox** (`GlobalPalStorage.sav`), refreshed 1.0 species / moves / passives / icons, level cap raised to 80.
+- 🛡️ **Save-safe** — opening a file and saving it back changes *nothing* unless you actually edit something (verified with a field-by-field comparison of every pal). It also cleans up phantom data older builds left behind — including the bug that made unassigned pals idly **"graze"** and produce nothing.
+- 📦 **Global Palbox management** — **add, clone, delete, and rename** pals right in the box.
+- 🔎 **Searchable everything:**
+  - **Attacks** — filter by element, sort by damage, toggle learnset / fruit-teachable / all.
+  - **Passives** — grouped by effect with **accurate descriptions** (e.g. *Lucky → Attack +15%, Defense +15%, Work Speed +20%*) shown on hover.
+  - **Species browser** — search + element / category / work-suitability / NPC-type filters, with internal codes shown so merchants and special NPCs are easy to find.
+  - **Pal-list filter bar** — search, element, and category over your loaded box.
+- 🎚️ **Work suitabilities 0–10** with grey / green / red feedback (grey = base, green = boosted, red = mutation/cheat range).
+- 📊 **Detailed stats popup** — current vs level-standard stats, plus IV, soul and condensation contributions.
+- ⭐ **Custom passive presets** — build named passive sets and stamp them onto any pal.
+- 💾 **Automatic per-session backups** — your save is copied to a `PalEdit-backups` folder before the first write.
+
+> [!TIP]
+> Editing focus so far has been the **Global Palbox**. As with any save editor, keep your own backups too. NPC/merchant editing works inside PalEdit but using them in-game is still experimental.
+
 > ⚠️ **Before Opening a new Issue**: Please check the [**🚧 Project roadmap**](#-project-roadmap) section to ensure that your concern or feature request hasn't already been addressed or is planned for a future release. Also check the [Open Issues](https://github.com/EternalWraith/PalEdit/issues).
 
 ## **📚 Table of Contents**
@@ -32,8 +60,8 @@ Download the compiled executable from [Nexus Mods](https://www.nexusmods.com/pal
 ## **⚠️ A word of warning**
 
 > [!CAUTION]
-> It is advised that you backup ALL save files before using the tool; it will eventually do this on it's own but doesn't yet.
-> For more information on how to do this, see the [**📦 Backing up your save**](#-backing-up-your-save) section.
+> This fork now makes an **automatic backup** of the loaded save (into a `PalEdit-backups` folder next to it) before its first write each session — but it is still wise to keep your own backups of ALL save files before using the tool.
+> For more information, see the [**📦 Backing up your save**](#-backing-up-your-save) section.
 
 ## **🕹️ Usage**
 
@@ -122,13 +150,23 @@ If you’ve installed Palworld via Steam, you can also access your save files by
 > We could really use the help of the community to make this tool better.
 > If you think you can help us deliver any of the features listed below, please feel free to open a pull request.
 
-- **Pending features:**
-  - [ ] Pal Deletion
-  - [ ] Stat Editing (Hero Statue)
-  - [ ] Edit Pals Nickname
-  - [ ] Improve Pal ListBox UI to mimic ingame PalBox
+- **✅ v1.0 fork (this release):**
+  - [x] Palworld 1.0 save-format support (read/write, Global Palbox)
+  - [x] Pal Deletion
+  - [x] Stat Editing + detailed stats/potential popup
+  - [x] Edit Pals Nickname
+  - [x] Improve Pal ListBox UI (filter bar + searchable species browser)
+  - [x] Automatic savefile backup
+  - [x] Add / Clone / Delete pals in the Global Palbox
+  - [x] Searchable, filterable attack / passive / species pickers
+  - [x] Work suitabilities 0–10 with colour feedback
+  - [x] Custom named passive presets
+  - [x] Save-safety fixes (no-edit open→save is a no-op; cleans phantom data)
+
+- **Still pending / help wanted:**
   - [ ] Add update notification if a newer version is found
-  - [ ] Automatic savefile backup
+  - [ ] Fully modern UI rewrite
+  - [ ] In-game placement of edited NPCs/merchants (currently experimental)
 
 - **v0.3 Release:**
   - [x] Integrate SaveTools into PalEdit natively.
