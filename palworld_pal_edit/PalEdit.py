@@ -1634,7 +1634,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
 
         cf = section("Combat stats  (current vs level standard)")
         grid_row(cf, 0, ("Stat", "Current", "Standard", "Δ"), (11, 8, 8, 6), bold=True)
-        for r, (label, key) in enumerate((("HP", "HP"), ("Attack", "PHY"), ("Defense", "DEF")), 1):
+        for r, (label, key) in enumerate((("HP", "HP"), ("Attack", "PHY"), ("Defence", "DEF")), 1):
             d = cur[key] - base[key]
             dtxt = f"+{d}" if d > 0 else (str(d) if d < 0 else "—")
             col = {3: ("#2b8a3e" if d > 0 else ("#c92a2a" if d < 0 else "black"))}
@@ -1649,7 +1649,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         sf = section("Souls & condensation")
         for r, (label, val) in enumerate((("Soul HP", pal.GetRankHP()),
                                           ("Soul Attack", pal.GetRankAttack()),
-                                          ("Soul Defense", pal.GetRankDefence()),
+                                          ("Soul Defence", pal.GetRankDefence()),
                                           ("Soul Work", pal.GetRankWorkSpeed()),
                                           ("Condensation", f"{pal.GetRank()} of 5"))):
             grid_row(sf, r, (label, str(val)), (13, 8))
