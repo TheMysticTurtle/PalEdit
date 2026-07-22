@@ -15,3 +15,6 @@ pals/error_*.json
 # Claude working notes (not for the public repo)
 CLAUDE.md
 .claude/
+
+# local reference copy of palworld-save-pal (not part of this fork)
+psp-reference/
