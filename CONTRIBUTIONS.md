@@ -39,6 +39,15 @@ individually.
 - Hide the stale-player warning when editing the Global Palbox, where it does
   not apply.
 
+- Work suitabilities editable up to 10 (mutations exceed the old cap of 5),
+  with grey/green/red feedback: grey at the species base, green when raised
+  within the normal range, red in the excessive 6-10 range.
+- Accurate passive descriptions generated from each passive's effects (e.g.
+  Lucky -> "Attack +15%, Defense +15%, Work Speed +20%") shown on hover in the
+  picker and main window.
+- A detailed stats/potential breakdown popup: combat stats vs the level
+  standard (colour-coded delta), IVs for breeding, souls and condensation.
+
 ## Fixes
 
 Work-suitability, move, and species-change handling were audited against the
