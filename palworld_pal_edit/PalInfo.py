@@ -258,10 +258,10 @@ class PalEntity:
         self._talent_hp = self._obj['Talent_HP']['value']["value"]
 
         # Palworld 1.0 removed the separate melee attack IV — a pal has one
-        # attack IV, Talent_Shot. Only pre-1.0 saves carry Talent_Melee; never
-        # add it (that pollutes 1.0 saves for every pal on open+save).
-        self._has_melee = "Talent_Melee" in self._obj
-        self._melee = self._obj['Talent_Melee']['value']["value"] if self._has_melee else 0
+        # attack IV, Talent_Shot. palworld-save-pal never reads or writes
+        # Talent_Melee, so any Talent_Melee present is pre-1.0 pollution.
+        # Strip it on load so re-saving cleans it, and never write it.
+        self._obj.pop("Talent_Melee", None)
 
         if not "Talent_Shot" in self._obj:
             self._obj['Talent_Shot'] = copy.deepcopy(EmptyTalentObject)
@@ -318,7 +318,6 @@ class PalEntity:
         self._learntMoves = []
         self.CleanseAttacks()
 
-        self.CleanseAttacks()
         if not "Hp" in self._obj:
             self._obj["Hp"] = copy.deepcopy(EmptyHpObject)
         self.UpdateMaxHP()
@@ -419,9 +418,13 @@ class PalEntity:
         invalid moves. _learntMoves is a display-only union and is never saved.
         """
         natural = self._naturalMoves()
-        natural_set = set(natural)
+        # Prune MasteredWaza against the FULL species learnset (every level),
+        # not just moves already learnable at this level: any learnset move is
+        # the game's to grant and does not belong in MasteredWaza. This also
+        # cleans pre-1.0 pollution where the whole learnset was dumped in.
+        full_learnset = set(PalLearnSet.get(self._type.GetCodeName(), {}))
         self._masteredMoves[:] = [m for m in self._masteredMoves
-                                  if self._validMove(m) and m not in natural_set]
+                                  if self._validMove(m) and m not in full_learnset]
         self._equipMoves[:] = [m for m in self._equipMoves if self._validMove(m)]
         pool = []
         for m in natural + self._masteredMoves + self._equipMoves:
@@ -455,9 +458,7 @@ class PalEntity:
         #self._obj['CraftSpeed']['value'] = self._workspeed = value
 
     def SetAttack(self, mval, rval):
-        self._melee = mval
-        if self._has_melee:  # only persist melee on legacy saves that have it
-            self._obj['Talent_Melee']['value']["value"] = mval
+        # 1.0 has a single attack IV (Talent_Shot); melee is ignored
         self._obj['Talent_Shot']['value']["value"] = self._ranged = rval
 
     def GetTalentHP(self):
@@ -612,14 +613,13 @@ class PalEntity:
         print("%s MaxHP: %s -> %s" % (self.GetFullName(), old_hp, new_hp))
 
     def GetAttackMelee(self):
-        # 1.0 pals have no melee IV; the attack stat uses Talent_Shot, so
-        # mirror it here to keep CalculateIngameStats correct.
-        return self._melee if self._has_melee else self._ranged
+        # 1.0 has no melee IV; the attack stat uses Talent_Shot. Mirror it so
+        # CalculateIngameStats stays correct without a Talent_Melee field.
+        return self._ranged
 
     def SetAttackMelee(self, value):
-        self._melee = value
-        if self._has_melee:  # never create Talent_Melee on a 1.0 save
-            self._obj['Talent_Melee']['value']["value"] = value
+        # melee IV was removed in 1.0; keep the single attack IV (Talent_Shot)
+        self.SetAttackRanged(value)
 
     def GetAttackRanged(self):
         return self._ranged
