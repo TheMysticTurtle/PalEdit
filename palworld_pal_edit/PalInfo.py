@@ -514,47 +514,54 @@ class PalEntity:
     
         #return self._obj['MaxHP']['value']['Value']['value']
 
-    def CalculateIngameStats(self):
+    def CalculateIngameStats(self, baseline=False):
+        """Computed in-game stats. With baseline=True, use the level-only
+        values (IV 0, souls 0, condensation rank 1) — the 'standard' stats for
+        this species at this level, for comparing against the pal's actual."""
         LEVEL = self.GetLevel()
         SCALING = self.GetObject().GetScaling()
+        talent_hp = 0 if baseline else self.GetTalentHP()
+        talent_at = 0 if baseline else self.GetAttackMelee()
+        talent_rn = 0 if baseline else self.GetAttackRanged()
+        talent_df = 0 if baseline else self.GetDefence()
+        soul_hp = 0 if baseline else self.GetRankHP()
+        soul_at = 0 if baseline else self.GetRankAttack()
+        soul_df = 0 if baseline else self.GetRankDefence()
+        rank = 1 if baseline else self.GetRank()
 
         HP_SCALE = SCALING["HP"]
         if self.isBoss and "HP_BOSS" in SCALING:
             HP_SCALE = SCALING["HP_BOSS"]
-        HP_IV = self.GetTalentHP() * 0.3 / 100
-        HP_SOUL = self.GetRankHP() * 0.03
-        HP_RANK = (self.GetRank() - 1) * 0.05
-        HP_BONUS = 0
+        HP_IV = talent_hp * 0.3 / 100
+        HP_SOUL = soul_hp * 0.03
+        HP_RANK = (rank - 1) * 0.05
 
         HP_STAT = math.floor(500 + 5 * LEVEL + HP_SCALE * 0.5 * LEVEL * (1 + HP_IV))
-        HP_STAT = math.floor(HP_STAT * (1 + HP_BONUS) * (1 + HP_SOUL) * (1 + HP_RANK))
+        HP_STAT = math.floor(HP_STAT * (1 + HP_SOUL) * (1 + HP_RANK))
 
         AT_SCALE = SCALING["PHY"]
-        AT_IV = self.GetAttackMelee() * 0.3 / 100
-        AT_SOUL = self.GetRankAttack() * 0.03
-        AT_RANK = (self.GetRank() - 1) * 0.05
-        AT_BONUS = 0
+        AT_IV = talent_at * 0.3 / 100
+        AT_SOUL = soul_at * 0.03
+        AT_RANK = (rank - 1) * 0.05
 
         AT_STAT = math.floor(100 + AT_SCALE * 0.075 * LEVEL * (1 + AT_IV))
-        AT_STAT = math.floor(AT_STAT * (1 + AT_BONUS) * (1 + AT_SOUL) * (1 + AT_RANK))
+        AT_STAT = math.floor(AT_STAT * (1 + AT_SOUL) * (1 + AT_RANK))
 
         MT_SCALE = SCALING["MAG"]
-        MT_IV = self.GetAttackRanged() * 0.3 / 100
-        MT_SOUL = self.GetRankAttack() * 0.03
-        MT_RANK = (self.GetRank() - 1) * 0.05
-        MT_BONUS = 0
+        MT_IV = talent_rn * 0.3 / 100
+        MT_SOUL = soul_at * 0.03
+        MT_RANK = (rank - 1) * 0.05
 
         MT_STAT = math.floor(100 + MT_SCALE * 0.075 * LEVEL * (1 + MT_IV))
-        MT_STAT = math.floor(MT_STAT * (1 + MT_BONUS) * (1 + MT_SOUL) * (1 + MT_RANK))
+        MT_STAT = math.floor(MT_STAT * (1 + MT_SOUL) * (1 + MT_RANK))
 
         DF_SCALE = SCALING["DEF"]
-        DF_IV = self.GetDefence() * 0.3 / 100
-        DF_SOUL = self.GetRankDefence() * 0.03
-        DF_RANK = (self.GetRank() - 1) * 0.05
-        DF_BONUS = 0
+        DF_IV = talent_df * 0.3 / 100
+        DF_SOUL = soul_df * 0.03
+        DF_RANK = (rank - 1) * 0.05
 
         DF_STAT = math.floor(50 + DF_SCALE * 0.075 * LEVEL * (1 + DF_IV))
-        DF_STAT = math.floor(DF_STAT * (1 + DF_BONUS) * (1 + DF_SOUL) * (1 + DF_RANK))
+        DF_STAT = math.floor(DF_STAT * (1 + DF_SOUL) * (1 + DF_RANK))
         return {"HP": HP_STAT, "PHY": AT_STAT, "MAG": MT_STAT, "DEF": DF_STAT}
 
 
