@@ -182,18 +182,14 @@ class PalEdit():
         self.updateSkillMenu()
         self.updateAttackName()
         self.updateSkillsName()
-        species = [PalInfo.PalSpecies[e].GetName() for e in PalInfo.PalSpecies]
-        species.sort()
+        # the species button shows the localized name via speciesvar_name;
+        # refresh it after a language change
         try:
-            self.palname.config(values=species)
-            #for idx, n in enumerate(species):
-                #self.palname['menu'].entryconfigure(idx, label=n,
-                                                    #command=tk._setit(self.speciesvar_name, n, self.changespeciestype))
             if self.speciesvar.get() in PalInfo.PalSpecies:
                 self.speciesvar_name.set(PalInfo.PalSpecies[self.speciesvar.get()].GetName())
             else:
                 self.speciesvar_name.set(self.speciesvar.get())
-        except AttributeError as e:
+        except AttributeError:
             pass
 
     def updateSkillMenu(self):
@@ -1292,6 +1288,32 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         "Transport": "Transport", "MonsterFarm": "Ranch",
     }
 
+    # NPC faction/role buckets, matched by codename keyword (first hit wins)
+    NPC_TYPES = ("Merchant", "Believer", "Police", "Hunter", "Scientist",
+                 "Soldier", "Arena", "Boss NPC", "Other")
+
+    @staticmethod
+    def _npc_type(code):
+        cl = code.lower()
+        if "trader" in cl or "merchant" in cl:
+            return "Merchant"
+        if "believer" in cl:
+            return "Believer"
+        if "police" in cl or "guard" in cl:
+            return "Police"
+        if "hunter" in cl:
+            return "Hunter"
+        if any(k in cl for k in ("scientist", "scholar", "doctor")):
+            return "Scientist"
+        if any(k in cl for k in ("soldier", "invader", "mercenary", "ninja",
+                                 "viking", "ranger", "ambassador")):
+            return "Soldier"
+        if "arena" in cl:
+            return "Arena"
+        if "boss" in cl:
+            return "Boss NPC"
+        return "Other"
+
     @staticmethod
     def _category_of(obj, code, is_human):
         """Bucket a species into Natural / Tower Bosses / Unobtainable / NPCs."""
@@ -1485,6 +1507,15 @@ Do you want to use %s's DEFAULT Scaling (%s)?
                            font=(PalEditConfig.font, PalEditConfig.ftsize - 11)
                            ).grid(row=idx // 4, column=idx % 4, sticky="w")
 
+        npc_vars = {t: tk.BooleanVar(value=False) for t in self.NPC_TYPES}
+        npcframe = tk.LabelFrame(top, text="NPC type (merchants, factions…)",
+                                 font=(PalEditConfig.font, PalEditConfig.ftsize - 10))
+        npcframe.pack(fill=tk.constants.X, padx=4, pady=2)
+        for idx, t in enumerate(self.NPC_TYPES):
+            tk.Checkbutton(npcframe, text=t, variable=npc_vars[t],
+                           font=(PalEditConfig.font, PalEditConfig.ftsize - 11)
+                           ).grid(row=idx // 4, column=idx % 4, sticky="w")
+
         countlbl = tk.Label(top, text="", font=(PalEditConfig.font, PalEditConfig.ftsize - 10))
         countlbl.pack(anchor="w", padx=6)
 
@@ -1504,6 +1535,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
             elem = element_var.get()
             cat = category_var.get()
             checked = [k for k, v in suit_vars.items() if v.get()]
+            npc_checked = [t for t, v in npc_vars.items() if v.get()]
             rows = []
             for code, obj in PalInfo.PalSpecies.items():
                 name = obj.GetName()
@@ -1515,6 +1547,10 @@ Do you want to use %s's DEFAULT Scaling (%s)?
                     continue
                 suits = getattr(obj, "_suits", {}) or {}
                 if any(suits.get(k, 0) <= 0 for k in checked):
+                    continue
+                # NPC-type filter: any checked type restricts to NPCs of those
+                # factions/roles (a non-NPC has no type, so it's excluded)
+                if npc_checked and (not obj._human or self._npc_type(code) not in npc_checked):
                     continue
                 rows.append((f"{name}  ({code})", code))
             rows.sort(key=lambda r: r[0].lower())
@@ -1536,7 +1572,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
             self._apply_species(pal, code)
 
         query.trace_add("write", rebuild)
-        for v in (element_var, category_var, *suit_vars.values()):
+        for v in (element_var, category_var, *suit_vars.values(), *npc_vars.values()):
             v.trace_add("write", rebuild)
         lb.bind("<Double-Button-1>", choose)
         lb.bind("<Return>", choose)
@@ -1559,6 +1595,11 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.setskillcolours()
         self.setAttackCols()
 
+        # clear first so refresh selects exactly `num`; otherwise repeated
+        # refreshes (e.g. updateDisplay then a targeted refresh after a species
+        # change) leave several rows selected and curselection()[0] picks the
+        # wrong one
+        self.listdisplay.selection_clear(0, tk.constants.END)
         self.listdisplay.select_set(num)
         self.listdisplay.event_generate("<<ListboxSelect>>")
 
@@ -2508,29 +2549,22 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         editview = tk.Frame(baseinfoview)
         editview.pack(side=tk.constants.RIGHT, expand=True, fill=tk.constants.BOTH)
 
-        species = [PalInfo.PalSpecies[e].GetName() for e in PalInfo.PalSpecies]
-        species.sort()
         self.speciesvar = tk.StringVar()
         self.speciesvar_name = tk.StringVar()
         self.speciesvar_name.set("PalEdit")
         speciesframe = tk.Frame(editview)
         speciesframe.pack(expand=True, fill=tk.constants.X)
-        self.palname = ttk.Combobox(speciesframe, textvariable=self.speciesvar_name, values=species)
-        #self.palname = tk.OptionMenu(editview, self.speciesvar_name, *species, command=self.changespeciestype)
-        self.palname.bind("<<ComboboxSelected>>", self.changespeciestype)
-        self.palname.config(font=(PalEditConfig.font, PalEditConfig.ftsize),
-                            #padx=0,
-                            #pady=0,
-                            #borderwidth=1,
-                            width=5,
-                            #direction='right'
-                            )
+        # Species is chosen through the searchable browser (with element,
+        # category, work-suitability and NPC-type filters) rather than a giant
+        # scrolling dropdown. The button shows the current species and, on
+        # click, opens the browser (🔍).
+        self.palname = tk.Button(speciesframe, textvariable=self.speciesvar_name,
+                                 command=self.open_species_browser, borderwidth=1,
+                                 font=(PalEditConfig.font, PalEditConfig.ftsize))
         self.palname.pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.X)
-        # 🔍 opens the searchable species browser (element/category/work filters)
-        browsebtn = tk.Button(speciesframe, text="🔍", borderwidth=1,
-                              font=(PalEditConfig.font, PalEditConfig.ftsize - 4),
-                              command=self.open_species_browser)
-        browsebtn.pack(side=tk.constants.RIGHT)
+        browselbl = tk.Label(speciesframe, text="🔍",
+                             font=(PalEditConfig.font, PalEditConfig.ftsize - 4))
+        browselbl.pack(side=tk.constants.RIGHT)
 
         genderframe = tk.Frame(editview, pady=0)
         genderframe.pack()
