@@ -1281,8 +1281,29 @@ Do you want to use %s's DEFAULT Scaling (%s)?
 
         return filterlist
 
-    # category buckets for the pal-list filter
-    PAL_CATEGORIES = ("All", "Obtainable", "Bosses & Towers", "NPCs & Humans")
+    # category buckets shared by the pal-list filter and the species browser
+    PAL_CATEGORIES = ("All", "Natural", "Tower Bosses", "Unobtainable", "NPCs")
+    # internal suit key -> friendly label, for the species-browser work filter
+    SUIT_LABELS = {
+        "EmitFlame": "Kindling", "Watering": "Watering", "Seeding": "Planting",
+        "GenerateElectricity": "Generating", "Handcraft": "Handiwork",
+        "Collection": "Gathering", "Deforest": "Lumbering", "Mining": "Mining",
+        "OilExtraction": "Oil", "ProductMedicine": "Medicine", "Cool": "Cooling",
+        "Transport": "Transport", "MonsterFarm": "Ranch",
+    }
+
+    @staticmethod
+    def _category_of(obj, code, is_human):
+        """Bucket a species into Natural / Tower Bosses / Unobtainable / NPCs."""
+        if is_human:
+            return "NPCs"
+        if getattr(obj, "_tower_boss", False) or code.startswith("GYM_"):
+            return "Tower Bosses"
+        if any(code.startswith(p) for p in ("RAID_", "SUMMON_", "PREDATOR_")):
+            return "Unobtainable"
+        if getattr(obj, "_deck_index", -1) >= 0:
+            return "Natural"
+        return "Unobtainable"
 
     def _apply_pal_filters(self, pals):
         """Filter the pal list by the search box, element, and category
@@ -1302,16 +1323,9 @@ Do you want to use %s's DEFAULT Scaling (%s)?
                 continue
             if element != "All" and element not in (p.GetPrimary(), p.GetSecondary()):
                 continue
-            if category != "All":
-                obj = p.GetObject()
-                is_boss = p.isBoss or getattr(obj, "_tower_boss", False) \
-                    or any(k in p.GetCodeName() for k in ("BOSS_", "GYM_", "RAID_"))
-                if category == "Obtainable" and not (getattr(obj, "_deck_index", -1) >= 0 and not p.IsHuman()):
-                    continue
-                if category == "Bosses & Towers" and not is_boss:
-                    continue
-                if category == "NPCs & Humans" and not p.IsHuman():
-                    continue
+            if category != "All" and \
+                    self._category_of(p.GetObject(), p.GetCodeName(), p.IsHuman()) != category:
+                continue
             out.append(p)
         return out
 
@@ -1422,11 +1436,116 @@ Do you want to use %s's DEFAULT Scaling (%s)?
             if PalInfo.PalSpecies[item].GetName() == self.speciesvar_name.get():
                 self.speciesvar.set(item)
                 break
+        self._apply_species(pal, self.speciesvar.get())
 
-        pal.SetType(self.speciesvar.get())
+    def _apply_species(self, pal, code):
+        """Change a pal's species and refresh the display around it."""
+        self.speciesvar.set(code)
+        self.speciesvar_name.set(PalInfo.PalSpecies[code].GetName())
+        pal.SetType(code)
         self.handleMaxHealthUpdates(pal)
         self.updateDisplay()
-        self.refresh(self.FilteredPals().index(pal))
+        try:
+            self.refresh(self.FilteredPals().index(pal))
+        except ValueError:
+            self.refresh(0)  # pal filtered out of view after the change
+
+    def open_species_browser(self):
+        """Searchable species picker with element, category and multi work-
+        suitability filters. Applies the chosen species to the selected pal."""
+        if not self.isPalSelected():
+            return "break"
+        i = int(self.listdisplay.curselection()[0])
+        pal = self.FilteredPals()[i]
+
+        top = tk.Toplevel(self.gui)
+        top.title(self.i18n.get('species_browser', "Species Browser"))
+        top.transient(self.gui)
+        top.geometry("440x580")
+
+        query = tk.StringVar()
+        element_var = tk.StringVar(value="All")
+        category_var = tk.StringVar(value="All")
+        suit_vars = {k: tk.BooleanVar(value=False) for k in self.SUIT_LABELS}
+
+        entry = tk.Entry(top, textvariable=query, font=(PalEditConfig.font, PalEditConfig.ftsize - 6))
+        entry.pack(fill=tk.constants.X, padx=4, pady=4)
+
+        bar = tk.Frame(top)
+        bar.pack(fill=tk.constants.X, padx=4)
+        elements = ["All"] + [e for e in PalInfo.PalElements if e != "None"]
+        tk.OptionMenu(bar, element_var, *elements).pack(side=tk.constants.LEFT)
+        tk.OptionMenu(bar, category_var, *self.PAL_CATEGORIES).pack(side=tk.constants.LEFT)
+
+        suitframe = tk.LabelFrame(top, text="Work suitability (base > 0)",
+                                  font=(PalEditConfig.font, PalEditConfig.ftsize - 10))
+        suitframe.pack(fill=tk.constants.X, padx=4, pady=2)
+        for idx, (k, label) in enumerate(self.SUIT_LABELS.items()):
+            tk.Checkbutton(suitframe, text=label, variable=suit_vars[k],
+                           font=(PalEditConfig.font, PalEditConfig.ftsize - 11)
+                           ).grid(row=idx // 4, column=idx % 4, sticky="w")
+
+        countlbl = tk.Label(top, text="", font=(PalEditConfig.font, PalEditConfig.ftsize - 10))
+        countlbl.pack(anchor="w", padx=6)
+
+        frame = tk.Frame(top)
+        frame.pack(expand=True, fill=tk.constants.BOTH, padx=4, pady=4)
+        sb = tk.Scrollbar(frame)
+        sb.pack(side=tk.constants.RIGHT, fill=tk.constants.Y)
+        lb = tk.Listbox(frame, yscrollcommand=sb.set,
+                        font=(PalEditConfig.font, PalEditConfig.ftsize - 6))
+        lb.pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.BOTH)
+        sb.config(command=lb.yview)
+
+        visible = []
+
+        def rebuild(*_):
+            text = query.get().strip().lower()
+            elem = element_var.get()
+            cat = category_var.get()
+            checked = [k for k, v in suit_vars.items() if v.get()]
+            rows = []
+            for code, obj in PalInfo.PalSpecies.items():
+                name = obj.GetName()
+                if text and text not in name.lower() and text not in code.lower():
+                    continue
+                if elem != "All" and elem not in (obj.GetPrimary(), obj.GetSecondary()):
+                    continue
+                if cat != "All" and self._category_of(obj, code, obj._human) != cat:
+                    continue
+                suits = getattr(obj, "_suits", {}) or {}
+                if any(suits.get(k, 0) <= 0 for k in checked):
+                    continue
+                rows.append((f"{name}  ({code})", code))
+            rows.sort(key=lambda r: r[0].lower())
+            lb.delete(0, tk.constants.END)
+            visible.clear()
+            for disp, code in rows:
+                visible.append(code)
+                lb.insert(tk.constants.END, disp)
+            countlbl.config(text=f"{len(rows)} species")
+            if lb.size() > 0:
+                lb.selection_set(0)
+
+        def choose(*_):
+            sel = lb.curselection()
+            if not sel:
+                return
+            code = visible[sel[0]]
+            top.destroy()
+            self._apply_species(pal, code)
+
+        query.trace_add("write", rebuild)
+        for v in (element_var, category_var, *suit_vars.values()):
+            v.trace_add("write", rebuild)
+        lb.bind("<Double-Button-1>", choose)
+        lb.bind("<Return>", choose)
+        entry.bind("<Return>", choose)
+        top.bind("<Escape>", lambda e: top.destroy())
+        rebuild()
+        entry.focus_set()
+        top.grab_set()
+        return "break"
 
     def setskillcolours(self):
         for snum in range(0, 4):
@@ -2394,7 +2513,9 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.speciesvar = tk.StringVar()
         self.speciesvar_name = tk.StringVar()
         self.speciesvar_name.set("PalEdit")
-        self.palname = ttk.Combobox(editview, textvariable=self.speciesvar_name, values=species)
+        speciesframe = tk.Frame(editview)
+        speciesframe.pack(expand=True, fill=tk.constants.X)
+        self.palname = ttk.Combobox(speciesframe, textvariable=self.speciesvar_name, values=species)
         #self.palname = tk.OptionMenu(editview, self.speciesvar_name, *species, command=self.changespeciestype)
         self.palname.bind("<<ComboboxSelected>>", self.changespeciestype)
         self.palname.config(font=(PalEditConfig.font, PalEditConfig.ftsize),
@@ -2404,7 +2525,12 @@ Do you want to use %s's DEFAULT Scaling (%s)?
                             width=5,
                             #direction='right'
                             )
-        self.palname.pack(expand=True, fill=tk.constants.X)
+        self.palname.pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.X)
+        # 🔍 opens the searchable species browser (element/category/work filters)
+        browsebtn = tk.Button(speciesframe, text="🔍", borderwidth=1,
+                              font=(PalEditConfig.font, PalEditConfig.ftsize - 4),
+                              command=self.open_species_browser)
+        browsebtn.pack(side=tk.constants.RIGHT)
 
         genderframe = tk.Frame(editview, pady=0)
         genderframe.pack()
