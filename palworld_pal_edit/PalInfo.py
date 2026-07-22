@@ -257,10 +257,10 @@ class PalEntity:
             self._talent_hp = 0  # we set 0, so if its not changed it should be removed by the game again.
         self._talent_hp = self._obj['Talent_HP']['value']["value"]
 
-        # Palworld 1.0 removed the separate melee attack IV — a pal has one
-        # attack IV, Talent_Shot. palworld-save-pal never reads or writes
-        # Talent_Melee, so any Talent_Melee present is pre-1.0 pollution.
-        # Strip it on load so re-saving cleans it, and never write it.
+        # Palworld 1.0 uses a single attack IV (Talent_Shot); the separate
+        # melee IV was removed and palworld-save-pal never reads or writes it.
+        # Drop any leftover Talent_Melee on load so re-saving matches 1.0, and
+        # don't write it.
         self._obj.pop("Talent_Melee", None)
 
         if not "Talent_Shot" in self._obj:
@@ -325,18 +325,16 @@ class PalEntity:
         if "GotWorkSuitabilityAddRankList" not in self._obj:
             self._obj["GotWorkSuitabilityAddRankList"] = copy.deepcopy(EmptyGotWorkObject)
         self.AddSuits = self._obj["GotWorkSuitabilityAddRankList"]
-        # The game only records work-suitability bonuses that are actually
-        # non-zero. Older PalEdit builds eagerly wrote a zero-rank entry for
-        # every suitability, bloating the list with 13 phantom entries per pal
-        # — which could break in-game work assignment (grazing/farming pals
-        # doing nothing). Prune zero-rank entries so the list matches what the
-        # game itself writes; SetSuit re-creates an entry only when needed.
+        # The game only records work-suitability bonuses that are non-zero.
+        # A zero-rank entry for every suitability (13 per pal) can interfere
+        # with in-game work assignment, so prune zero-rank entries on load to
+        # match what the game itself writes; SetSuit re-creates an entry only
+        # when a real bonus is set.
         self.AddSuits["value"]["values"] = [
             x for x in self.AddSuits["value"]["values"] if x["Rank"]["value"] != 0
         ]
-        # Strip the pre-1.0 "CraftSpeeds" field if an older PalEdit wrote one;
-        # 1.0 saves never have it. Removing it on load means simply re-saving
-        # a polluted save cleans it out.
+        # CraftSpeeds is a pre-1.0 field; 1.0 saves don't have it. Drop it on
+        # load so re-saving matches the current format.
         self._obj.pop("CraftSpeeds", None)
                 
                 
@@ -421,7 +419,7 @@ class PalEntity:
         # Prune MasteredWaza against the FULL species learnset (every level),
         # not just moves already learnable at this level: any learnset move is
         # the game's to grant and does not belong in MasteredWaza. This also
-        # cleans pre-1.0 pollution where the whole learnset was dumped in.
+        # clears any learnset moves an earlier build may have stored here.
         full_learnset = set(PalLearnSet.get(self._type.GetCodeName(), {}))
         self._masteredMoves[:] = [m for m in self._masteredMoves
                                   if self._validMove(m) and m not in full_learnset]
@@ -439,11 +437,10 @@ class PalEntity:
         self._obj['CharacterID']['value'] = ("BOSS_" if (self.isBoss or self.isLucky) and not self.IsHuman() else "") + value
         self._type = PalSpecies[value]
         self.CleanseAttacks()
-        # NOTE: pre-1.0 PalEdit also wrote a "CraftSpeeds" field here with the
+        # NOTE: earlier versions also wrote a "CraftSpeeds" field here with the
         # new species' work ranks. Palworld 1.0 saves have no such field (the
         # game derives work suitability from species data + the
-        # GotWorkSuitabilityAddRankList bonuses), so writing it only polluted
-        # the save and could break work assignment. It is intentionally gone.
+        # GotWorkSuitabilityAddRankList bonuses), so it is no longer written.
 
     def GetObject(self) -> PalObject:
         return self._type

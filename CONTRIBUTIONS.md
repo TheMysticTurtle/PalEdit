@@ -53,12 +53,12 @@ individually.
 Work-suitability, move, and species-change handling were audited against the
 public 1.0 editor *palworld-save-pal* to confirm the correct 1.0 field model.
 
-- Fix work-suitability corruption. Pals lost their farming/grazing/kindling
-  behaviour because opening and saving injected a zero-rank entry into
-  `GotWorkSuitabilityAddRankList` for every suitability (13 phantom entries
-  per pal). Zero-rank entries are now pruned on load and never written; a
+- Fix work-suitability corruption. Pals could lose their farming/grazing/
+  kindling behaviour because opening and saving added a zero-rank entry to
+  `GotWorkSuitabilityAddRankList` for every suitability (13 unused entries per
+  pal). Zero-rank entries are now pruned on load and never written; a
   suitability entry is created only for a real, non-zero bonus. Loading a
-  previously affected save and re-saving removes the phantom entries.
+  previously affected save and re-saving removes the extra entries.
 - Fix work suitabilities "flip-flopping" between pals: on selecting a pal, the
   suitability controls set their value before their minimum, so a stale
   minimum from the previous pal could clamp and later write a wrong value. The
@@ -68,11 +68,11 @@ public 1.0 editor *palworld-save-pal* to confirm the correct 1.0 field model.
   species change; 1.0 saves have no such field and the game derives work
   suitability from species data plus `GotWorkSuitabilityAddRankList`. It is no
   longer written and is stripped on load.
-- Stop `MasteredWaza` pollution. The move list was auto-filled with the whole
-  species learnset on load, so opening and saving added phantom "mastered"
+- Correct `MasteredWaza` handling. The move list was being filled with the
+  whole species learnset on load, so opening and saving added extra "mastered"
   moves to every pal. `MasteredWaza` now holds only moves taught beyond the
   natural learnset (matching the game); the displayed move pool is derived and
-  never written. Previously polluted lists are cleaned on load.
+  never written. Previously affected lists are cleaned on load.
 - Remove the pre-1.0 `Talent_Melee` IV. 1.0 pals have a single attack IV
   (`Talent_Shot`); the melee IV was dropped. It was being added to every pal
   on load. It is now only touched on legacy saves that already have it.

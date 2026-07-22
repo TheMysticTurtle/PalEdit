@@ -2777,10 +2777,9 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.speciesvar_name.set("PalEdit")
         speciesframe = tk.Frame(editview)
         speciesframe.pack(expand=True, fill=tk.constants.X)
-        # Species is chosen through the searchable browser (with element,
-        # category, work-suitability and NPC-type filters) rather than a giant
-        # scrolling dropdown. The button shows the current species and, on
-        # click, opens the browser (🔍).
+        # Species is chosen through the searchable browser (element, category,
+        # work-suitability and NPC-type filters). The button shows the current
+        # species and, on click, opens the browser (🔍).
         self.palname = tk.Button(speciesframe, textvariable=self.speciesvar_name,
                                  command=self.open_species_browser, borderwidth=1,
                                  font=(PalEditConfig.font, PalEditConfig.ftsize))
@@ -2995,7 +2994,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.skilldrops[3].bind("<Enter>", lambda evt, num=3: self.changetext(num))
         self.skilldrops[0].bind("<Leave>", lambda evt, num=-1: self.changetext(num))
 
-        # replace the 400-entry dropdown menus with a searchable picker
+        # open a searchable picker for the passive/attack slots on click
         for _n, _w in enumerate(self.skilldrops):
             _w.bind("<Button-1>", lambda evt, n=_n: self.open_ability_search("passive", n))
         for _n, _w in enumerate(self.attackdrops):

@@ -26,7 +26,7 @@
 ## ✨ What's new in the 1.0 update
 
 - 🐣 **Full Palworld 1.0 support** — reads & writes the new save format, loads the **Global Palbox** (`GlobalPalStorage.sav`), refreshed 1.0 species / moves / passives / icons, level cap raised to 80.
-- 🛡️ **Save-safe** — opening a file and saving it back changes *nothing* unless you actually edit something (verified with a field-by-field comparison of every pal). It also cleans up phantom data older builds left behind — including the bug that made unassigned pals idly **"graze"** and produce nothing.
+- 🛡️ **Save-safe** — opening a file and saving it back changes *nothing* unless you actually edit something (verified with a field-by-field comparison of every pal). It also tidies up leftover data from earlier versions — including the issue that made unassigned pals idly **"graze"** and produce nothing.
 - 📦 **Global Palbox management** — **add, clone, delete, and rename** pals right in the box.
 - 🔎 **Searchable everything:**
   - **Attacks** — filter by element, sort by damage, toggle learnset / fruit-teachable / all.
@@ -161,7 +161,7 @@ If you’ve installed Palworld via Steam, you can also access your save files by
   - [x] Searchable, filterable attack / passive / species pickers
   - [x] Work suitabilities 0–10 with colour feedback
   - [x] Custom named passive presets
-  - [x] Save-safety fixes (no-edit open→save is a no-op; cleans phantom data)
+  - [x] Save-safety fixes (no-edit open→save is a no-op; tidies leftover data)
 
 - **Still pending / help wanted:**
   - [ ] Add update notification if a newer version is found
