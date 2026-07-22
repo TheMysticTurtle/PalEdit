@@ -1750,11 +1750,14 @@ Do you want to use %s's DEFAULT Scaling (%s)?
     def clonepal_storage(self):
         i = int(self.listdisplay.curselection()[0])
         pal = self.FilteredPals()[i]
+        source_iid = pal.GetPalInstanceGuid()
         new_iid = self._palbox_insert(pal._obj)
         if new_iid is None:
             return
         self.loaddata(self.data)
-        self._select_palbox_instance(new_iid)
+        # keep the selection on the pal we cloned FROM, so cloning a
+        # mid-list pal repeatedly doesn't slip back to the top of the box
+        self._select_palbox_instance(source_iid)
 
     def addpal_storage(self):
         """Add a brand-new default pal (a turtle) to the Global Palbox."""
@@ -1791,14 +1794,17 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         entry = self._find_palbox_entry(pal.GetPalInstanceGuid())
         if entry is None:
             return
-        # restore the slot to a pristine null placeholder
+        # Restore the slot to a pristine vacant placeholder. Prefer copying an
+        # actual game-produced empty slot; otherwise clear it the way the game
+        # marks a vacancy: CharacterID "None" and SlotIndex -1, with the slot's
+        # ContainerId left untouched (per palworld-save-pal's GPS handling).
         blank = self._find_empty_palbox_entry()
         if blank is not None:
             entry['SaveParameter']['value'] = copy.deepcopy(blank['SaveParameter']['value'])
         else:
-            entry['SaveParameter']['value']['CharacterID']['value'] = "None"
-            entry['SaveParameter']['value']['SlotId']['value'] \
-                ['ContainerId']['value']['ID']['value'] = UUID.from_str(self.ZERO_GUID)
+            sp = entry['SaveParameter']['value']
+            sp['CharacterID']['value'] = "None"
+            sp['SlotId']['value']['SlotIndex']['value'] = -1
         entry['InstanceId']['value']['InstanceId']['value'] = UUID.from_str(self.ZERO_GUID)
         self.loaddata(self.data)
 
