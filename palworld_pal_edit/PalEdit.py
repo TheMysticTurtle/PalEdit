@@ -576,20 +576,23 @@ class PalEdit():
         rows = []
         visible = []
 
+        def _desc_for(code):
+            if code == "None":
+                return "Clear this slot."
+            if kind == "passive":
+                return PalInfo.PassiveDescriptions.get(code, "")
+            return (f"{PalInfo.AttackTypes.get(code, '')} · "
+                    f"power {PalInfo.AttackPower.get(code, '?')} · "
+                    f"{PalInfo.AttackCats.get(code, '')}")
+
         def show_desc(*_):
             sel = lb.curselection()
-            if not sel:
-                desc.config(text="")
-                return
-            code = visible[sel[0]]
-            if code == "None":
-                desc.config(text="Clear this slot.")
-            elif kind == "passive":
-                desc.config(text=PalInfo.PassiveDescriptions.get(code, ""))
-            else:
-                desc.config(text=f"{PalInfo.AttackTypes.get(code, '')} · "
-                                 f"power {PalInfo.AttackPower.get(code, '?')} · "
-                                 f"{PalInfo.AttackCats.get(code, '')}")
+            desc.config(text=_desc_for(visible[sel[0]]) if sel else "")
+
+        def hover_desc(evt):
+            idx = lb.nearest(evt.y)
+            if 0 <= idx < len(visible):
+                desc.config(text=_desc_for(visible[idx]))
 
         def rebuild(*_):
             # recompute the candidate rows from the current toolbar settings
@@ -636,6 +639,7 @@ class PalEdit():
         for v in (tier_var, element_var, sort_var, group_var, natural_var):
             v.trace_add("write", rebuild)
         lb.bind("<<ListboxSelect>>", show_desc)
+        lb.bind("<Motion>", hover_desc)
 
         def choose(*_):
             sel = lb.curselection()

@@ -200,6 +200,45 @@ def _passive_group(psp_entry):
     return "Other"
 
 
+# passive effect type -> readable label, for generating accurate descriptions
+EFFECT_LABELS = {
+    "ShotAttack": "Attack", "Defense": "Defense", "CraftSpeed": "Work Speed",
+    "MoveSpeed": "Move Speed", "MaxHP": "Max HP", "MaxInventoryWeight": "Carry Weight",
+    "Logging": "Logging", "Mining": "Mining", "CollectItem": "Gathering",
+    "LifeSteal": "Life Steal", "BreedSpeed": "Breeding Speed",
+    "PalEggHatchingSpeed": "Egg Hatching", "PalExp_Increase": "Pal EXP",
+    "PalSP_Increase": "Partner Skill", "JumpCount_Increase": "Jumps",
+    "JumpPower_Increase": "Jump Power", "ActiveSkillCoolTime_Decrease": "Skill Cooldown",
+    "Sanity_Decrease": "Sanity Drain", "FullStomatch_Decrease": "Hunger Rate",
+    "ShopBuyPrice_Money_Increase": "Buy Price", "ShopSellPrice_Money_Increase": "Sell Price",
+    "TemperatureResist_Cold": "Cold Resistance", "TemperatureResist_Heat": "Heat Resistance",
+    "Nocturnal": "Nocturnal", "NonKilling": "Non-lethal Attacks",
+}
+
+
+def _effect_label(etype):
+    if etype in EFFECT_LABELS:
+        return EFFECT_LABELS[etype]
+    if etype.startswith("ElementBoost_"):
+        return etype.split("_", 1)[1] + " Attack"
+    if etype.startswith("ElementResist_"):
+        return etype.split("_", 1)[1] + " Resistance"
+    return etype
+
+
+def passive_effect_desc(psp_entry):
+    """Readable summary of what a passive adjusts, e.g. 'Attack +15%,
+    Defense +15%, Work Speed +20%', built from its effects."""
+    parts = []
+    for eff in (psp_entry or {}).get("effects", []):
+        t, v = eff.get("type"), eff.get("value", 0)
+        if not t or t == "None" or not v:
+            continue
+        val = int(v) if float(v).is_integer() else v
+        parts.append(f"{_effect_label(t)} {'+' if v > 0 else ''}{val}%")
+    return ", ".join(parts)
+
+
 def update_passives(psp_passives):
     ppath = os.path.join(RES, "passives.json")
     passives = jload(ppath)
@@ -218,7 +257,7 @@ def update_passives(psp_passives):
     return passives
 
 
-def update_l10n(psp_pals, psp_attacks, passives):
+def update_l10n(psp_pals, psp_attacks, passives, psp_passives):
     for pe_lang, psp_lang in LANG_MAP.items():
         ldir = os.path.join(RES, pe_lang)
         if not os.path.isdir(ldir):
@@ -251,10 +290,15 @@ def update_l10n(psp_pals, psp_attacks, passives):
         for code in passives:
             loc = loc_pas.get(code, {})
             name, desc = loc.get("localized_name"), loc.get("description")
+            # Prefer an accurate effect summary (English) over the often-vague
+            # localized blurb ("Lucky" -> "Attack +15%, Defense +15%, ...").
+            eff = passive_effect_desc(psp_passives.get(code)) if pe_lang == "en-GB" else ""
             if name and name != "en_text":
-                cur[code] = {"Name": name, "Description": desc or name}
+                # accurate effect summary first; fall back to the localized
+                # blurb for passives that have no numeric effects
+                cur[code] = {"Name": name, "Description": eff or desc or name}
             else:
-                cur.setdefault(code, {"Name": code, "Description": code})
+                cur.setdefault(code, {"Name": code, "Description": eff or code})
         jsave(os.path.join(ldir, "passives.json"), cur)
         print(f"l10n {pe_lang} refreshed")
 
@@ -322,7 +366,7 @@ def main():
     update_pals(psp_pals)
     update_attacks(psp_attacks, psp_pals)
     passives = update_passives(psp_passives)
-    update_l10n(psp_pals, psp_attacks, passives)
+    update_l10n(psp_pals, psp_attacks, passives, psp_passives)
     if "--icons" in sys.argv:
         update_icons()
 
