@@ -86,18 +86,12 @@ through the *Pal Genetic Data* terminal in-game.
 4. **Save.** Choose **File → Save**. The first save of each session automatically copies your original file into a `PalEdit-backups` folder next to it, just in case.
 5. **Pick your changes up in-game** — see below.
 
-### 🎮 Getting your edits into the game
+### 🎮 How Global Palbox syncing works
 
-Open the **Global Palbox** at a *Pal Genetic Data* terminal. Your edited and newly
-added Pals sit on the Global side; move them into a local box to use them:
+Each Pal is associated with a unique ID, and the Global Palbox can copy that Pal's data in either direction:
 
-- **Edited an existing Pal?** Drag it from the Global Palbox into your local box — the changes are there **right away**. The game shows the new genetic data next to what it's replacing:
-
-  ![Transferring an edited Pal — new genetic data vs the data being overwritten](docs/images/update-existing-pal.png)
-
-- **Added a brand-new Pal?** Drag it onto an **empty slot** in your local box. Freshly reconstructed Pals sit on a short cooldown (around **10 minutes**), after which they behave just like any other Pal:
-
-  ![A newly added Pal reconstructing on its cooldown in the local box](docs/images/add-new-pal.png)
+- Dragging a Pal from a **local Palbox into the Global Palbox** updates the Global copy with the Pal's current data from that world.
+- Dragging a Pal from the **Global Palbox back into a local Palbox** applies the Global copy's data in that world.
 
 > [!TIP]
 > **Edit with Palworld closed.** Close the game before you load your save in PalEdit,
@@ -106,6 +100,35 @@ added Pals sit on the Global side; move them into a local box to use them:
 > shut is the safe way to go. Your edits appear the next time you open the *Pal Genetic
 > Data* terminal — and if anything ever looks off, you still have the automatic
 > `PalEdit-backups` copy (and your own backup) to fall back on.
+
+#### Updating an existing Pal
+
+1. In-game, drag the Pal from your local Palbox into the Global Palbox. This updates the Global copy with the Pal's current progress from that world.
+2. Close Palworld.
+3. Load `GlobalPalStorage.sav` in PalEdit, make your changes, and save.
+4. Reopen Palworld and access the *Pal Genetic Data* terminal.
+5. Drag the edited Pal from the Global Palbox back into your local Palbox.
+
+Because an existing Pal already has an associated unique ID, you can drag it anywhere in your local box. The edited data is applied immediately.
+
+![Transferring an edited Pal — new genetic data vs the data being overwritten](docs/images/update-existing-pal.png)
+
+#### Adding a brand-new Pal
+
+1. Add or clone the Pal in PalEdit and save your Global Palbox.
+2. Open Palworld and access the *Pal Genetic Data* terminal.
+3. Drag the new Pal from the Global Palbox into an **empty slot** in your local Palbox.
+
+A brand-new Pal must be placed into an empty local slot because it does not yet have an existing local copy associated with it.
+
+Newly created Pals currently arrive in a disabled state, similar to a Pal that has been knocked out, and receive a recovery timer of approximately **9–10 minutes**.
+
+![A newly added Pal reconstructing on its cooldown in the local box](docs/images/add-new-pal.png)
+
+After the recovery timer finishes, the Pal behaves normally. You can then drag the recovered local Pal back into the Global Palbox to update the Global copy with its active, recovered state.
+
+> [!NOTE]
+> I will be looking into why newly created Pals enter the game in a disabled state to see whether this workflow can be improved in a future release.
 
 ## **💾 Adding, cloning & deleting Pals**
 
