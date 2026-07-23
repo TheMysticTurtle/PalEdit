@@ -22,9 +22,13 @@ individually.
   default species and can be re-typed from there.
 - Edit pal nicknames (updates both `NickName` and the 1.0 `FilteredNickName`).
 - Searchable attack picker with a tier toggle (learnset / fruit-teachable /
-  all), element filter, and damage sort.
+  all), element filter, and damage sort. Each move is tinted by its element so
+  the list reads at a glance. The "add a move" box under the moveset opens the
+  same picker (the ➕ button still commits the staged move).
 - Searchable passive picker grouped by effect (Attack, Defense, Work, etc.),
-  with a per-passive effect description and a natural-only / all toggle.
+  with a per-passive effect description and a natural-only / all toggle. The
+  four slots in the passive-preset editor use the same picker, pal-agnostically
+  (any passive can go into a preset).
 - Automatic save backup: the loaded save is copied to a `PalEdit-backups`
   folder before the first write of each editing session.
 - Pal-list filter bar: name search, element filter, and a category toggle
@@ -45,8 +49,14 @@ individually.
 - Accurate passive descriptions generated from each passive's effects (e.g.
   Lucky -> "Attack +15%, Defense +15%, Work Speed +20%") shown on hover in the
   picker and main window.
-- A detailed stats/potential breakdown popup: combat stats vs the level
-  standard (colour-coded delta), IVs for breeding, souls and condensation.
+- A detailed stats/potential breakdown popup, now editable in place: combat
+  stats vs the level standard (colour-coded delta), plus spinboxes for the IVs
+  (0-100), the four souls (0-20) and condensation (shown as the in-game 0-4
+  stars). An edit updates the pal and the main window together, and the combat
+  column re-computes so you can watch a stat move as you tune it.
+- The level at the top of the pal panel can be typed directly as well as
+  stepped with the ➖ / ➕ buttons; typed input is clamped to 1..level cap and
+  the field and buttons always agree.
 
 ## Fixes
 
