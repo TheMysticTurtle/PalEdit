@@ -514,27 +514,46 @@ class PalEdit():
                 codes.append(c)
         return codes
 
-    def open_ability_search(self, kind, num):
+    def open_ability_search(self, kind, num=None, anchor=None, on_choose=None,
+                            include_none=True, pal=None):
         """Searchable picker used by the passive and equipped-attack slots.
 
         For attacks a small toolbar adds a tier toggle (standard / fruit /
-        all), an element filter and a sort order (name or power)."""
-        if not self.isPalSelected():
-            return "break"
-        i = int(self.listdisplay.curselection()[0])
-        pal = self.FilteredPals()[i]
+        all), an element filter and a sort order (name or power).
 
-        anchor = self.skilldrops[num] if kind == "passive" else self.attackdrops[num]
+        The picker is reused beyond the fixed slots:
+          - ``anchor`` is the widget the popup positions itself under
+            (defaults to the slot control for ``num``).
+          - ``on_choose(code)`` overrides what happens when an entry is picked
+            (default: apply it to slot ``num``). This lets the fruit "add a
+            move" box and the preset editor share the same searchable list.
+          - ``include_none`` shows the "None" (clear) row; drop it where
+            clearing makes no sense (adding an extra move).
+          - ``pal`` may be passed directly; when omitted the currently selected
+            pal is used. Passives allow ``pal=None`` to offer every passive
+            (species-agnostic, e.g. building a preset)."""
+        if pal is None:
+            if not self.isPalSelected():
+                return "break"
+            i = int(self.listdisplay.curselection()[0])
+            pal = self.FilteredPals()[i]
+        # attacks always need a species to enumerate; passives can run pal-less
+        if pal is None and kind == "attack":
+            return "break"
+
+        if anchor is None:
+            anchor = self.skilldrops[num] if kind == "passive" else self.attackdrops[num]
 
         top = tk.Toplevel(self.gui)
         top.title(self.i18n.get('search_title', "Search..."))
-        top.transient(self.gui)
+        top.transient(anchor.winfo_toplevel())
         x, y = anchor.winfo_rootx(), anchor.winfo_rooty() + anchor.winfo_height()
         top.geometry(f"360x440+{x}+{y}")
 
         # --- filter toolbar (per kind) ---
-        default_natural = (getattr(self, 'filterlegal', None) is None
-                           or self.filterlegal.get())
+        default_natural = (pal is not None
+                           and (getattr(self, 'filterlegal', None) is None
+                                or self.filterlegal.get()))
         default_tier = "fruit" if default_natural else "all"
         tier_var = tk.StringVar(value=default_tier)
         element_var = tk.StringVar(value="All")
@@ -553,7 +572,10 @@ class PalEdit():
             bar.pack(fill=tk.constants.X, padx=4, pady=(4, 0))
             groups = ["All"] + sorted(set(PalInfo.PassiveGroup.values()))
             tk.OptionMenu(bar, group_var, *groups).pack(side=tk.constants.LEFT)
-            tk.Checkbutton(bar, text="Natural only", variable=natural_var).pack(side=tk.constants.LEFT)
+            # "Natural only" is meaningful only when we have a specific pal to
+            # be natural *to*; a pal-less preset picker offers every passive.
+            if pal is not None:
+                tk.Checkbutton(bar, text="Natural only", variable=natural_var).pack(side=tk.constants.LEFT)
 
         query = tk.StringVar()
         entry = tk.Entry(top, textvariable=query, font=(PalEditConfig.font, PalEditConfig.ftsize))
@@ -598,7 +620,12 @@ class PalEdit():
             # recompute the candidate rows from the current toolbar settings
             rows.clear()
             if kind == "passive":
-                codes = self.availablePassives(pal, natural_var.get())
+                if pal is None:
+                    # pal-less (preset) mode: every real passive is fair game
+                    codes = [c for c in PalInfo.PalPassives
+                             if c not in ("NONE", "UNKNOWN", "None", "Unknown")]
+                else:
+                    codes = self.availablePassives(pal, natural_var.get())
                 if group_var.get() != "All":
                     codes = [c for c in codes if PalInfo.PassiveGroup.get(c, "Other") == group_var.get()]
                 # cluster by group, then name, so like effects sit together
@@ -617,7 +644,8 @@ class PalEdit():
                     codes.sort(key=lambda c: PalInfo.PalAttacks[c])
                 for c in codes:
                     rows.append((f"{PalInfo.PalAttacks[c]}  ({PalInfo.AttackPower.get(c, '?')})  {PalInfo.AttackTypes.get(c, '')}", c))
-            rows.insert(0, ("None", "None"))
+            if include_none:
+                rows.insert(0, ("None", "None"))
             refill()
 
         def refill(*_):
@@ -632,6 +660,14 @@ class PalEdit():
                         col = PalEditConfig.skill_col[int(PalInfo.PassiveRating.get(code, "0")) + 3]
                         if col not in ("#DFE8E7", "#000000"):
                             lb.itemconfig(tk.constants.END, {'fg': PalEdit.mean_color(col, "000000")})
+                    elif kind == "attack" and code != "None":
+                        # tint each move by its element, so the list reads at a
+                        # glance (Fire rows red, Water blue, ...); darkened for
+                        # contrast on the light listbox, matching the passives
+                        elem = PalInfo.AttackTypes.get(code, "")
+                        ecol = PalInfo.PalElements.get(elem)
+                        if ecol and elem not in ("", "None"):
+                            lb.itemconfig(tk.constants.END, {'fg': PalEdit.mean_color(ecol, "000000")})
             if lb.size() > 0:
                 lb.selection_set(0)
             show_desc()
@@ -647,7 +683,9 @@ class PalEdit():
                 return
             code = visible[sel[0]]
             top.destroy()
-            if kind == "passive":
+            if on_choose is not None:
+                on_choose(code)
+            elif kind == "passive":
                 self.changeskill(num, code)
             else:
                 self.attacks[num].set(code)
@@ -1554,15 +1592,24 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         tk.Entry(nameframe, textvariable=namevar, font=(PalEditConfig.font, PalEditConfig.ftsize - 8)
                  ).pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.X)
 
+        def pick_slot(code, sv):
+            sv.set("(none)" if code in ("None", "NONE") else PalInfo.PalPassives.get(code, "(none)"))
+            top.grab_set()  # restore the manager's modal grab after the picker closes
+
         slotvars = [tk.StringVar(value="(none)") for _ in range(4)]
         for si, sv in enumerate(slotvars):
             row = tk.Frame(top)
             row.pack(fill=tk.constants.X, padx=6, pady=1)
             tk.Label(row, text=f"Slot {si + 1}:", width=6, anchor="w",
                      font=(PalEditConfig.font, PalEditConfig.ftsize - 8)).pack(side=tk.constants.LEFT)
-            ttk.Combobox(row, textvariable=sv, values=options,
-                         font=(PalEditConfig.font, PalEditConfig.ftsize - 8)
-                         ).pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.X)
+            combo = ttk.Combobox(row, textvariable=sv, values=options,
+                                 font=(PalEditConfig.font, PalEditConfig.ftsize - 8))
+            combo.pack(side=tk.constants.LEFT, expand=True, fill=tk.constants.X)
+            # clicking a slot opens the searchable, grouped, colour-coded passive
+            # picker (pal-agnostic, so any passive can go into a preset)
+            combo.bind("<Button-1>", lambda e, s=sv, c=combo: self.open_ability_search(
+                "passive", anchor=c, on_choose=lambda code, sv=s: pick_slot(code, sv),
+                pal=None) or "break")
 
         def load_into_editor(*_):
             sel = plist.curselection()
@@ -2209,13 +2256,30 @@ Do you want to use %s's DEFAULT Scaling (%s)?
             pal.StripAttack(PalInfo.find(m))
             self.refresh(i)
 
+    def _pick_fruit_move(self, code):
+        """Picker callback for the add-a-move box: stage the chosen move so the
+        ➕ button commits it. Keeps the familiar pick-then-add flow, now backed
+        by the full searchable / element-sorted list instead of a plain drop."""
+        self._fruit_pick_code = code
+        self.fruitPicker.set(PalInfo.PalAttacks.get(code, ""))
+
     def appendMove(self):
         if not self.isPalSelected():
             return
         i = int(self.listdisplay.curselection()[0])
         pal = self.FilteredPals()[i]
 
-        pal.FruitAttack(PalInfo.find(self.fruitPicker.get()))
+        text = self.fruitPicker.get()
+        # prefer the exact code staged by the searchable picker; fall back to a
+        # name lookup for anything typed straight into the box
+        code = getattr(self, "_fruit_pick_code", None)
+        if not code or PalInfo.PalAttacks.get(code) != text:
+            code = PalInfo.find(text)
+        if not code:
+            return
+        pal.FruitAttack(code)
+        self._fruit_pick_code = None
+        self.fruitPicker.set("")
         self.refresh(i)
 
     def createWindow(self):
@@ -2584,6 +2648,7 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         self.fruitOptions = ttk.Combobox(wazaDisplay, textvariable=self.fruitPicker)
         self.fruitOptions.pack(fill=tk.constants.BOTH)
         self._fruit_all = []
+        self._fruit_pick_code = None
 
         def filterfruit(evt=None):
             if evt is not None and evt.keysym in ("Up", "Down", "Return", "Escape"):
@@ -2592,6 +2657,12 @@ Do you want to use %s's DEFAULT Scaling (%s)?
             vals = [v for v in self._fruit_all if txt in v.lower()]
             self.fruitOptions['values'] = vals if vals else self._fruit_all
         self.fruitOptions.bind("<KeyRelease>", filterfruit)
+        # clicking the box opens the full searchable picker (tier / element /
+        # sort, colour-coded) just like the equipped-attack slots; the ➕
+        # button still commits the staged move
+        self.fruitOptions.bind("<Button-1>", lambda e: self.open_ability_search(
+            "attack", anchor=self.fruitOptions, on_choose=self._pick_fruit_move,
+            include_none=False) or "break")
         addMove = tk.Button(wazaButtons, text="➕", borderwidth=1, font=(PalEditConfig.font, PalEditConfig.ftsize - 10),
                             command=self.appendMove,
                             bg="darkgrey")
