@@ -1681,25 +1681,73 @@ Do you want to use %s's DEFAULT Scaling (%s)?
 
         cf = section("Combat stats  (current vs level standard)")
         grid_row(cf, 0, ("Stat", "Current", "Standard", "Δ"), (11, 8, 8, 6), bold=True)
+        # keep the current/Δ labels so edits below can refresh them in place
+        combat_rows = []
         for r, (label, key) in enumerate((("HP", "HP"), ("Attack", "PHY"), ("Defence", "DEF")), 1):
-            d = cur[key] - base[key]
-            dtxt = f"+{d}" if d > 0 else (str(d) if d < 0 else "—")
-            col = {3: ("#2b8a3e" if d > 0 else ("#c92a2a" if d < 0 else "black"))}
-            grid_row(cf, r, (label, str(cur[key]), str(base[key]), dtxt), (11, 8, 8, 6), colours=col)
+            tk.Label(cf, text=label, width=11, anchor="w",
+                     font=(f, PalEditConfig.ftsize - 8)).grid(row=r, column=0, sticky="w", padx=2)
+            cur_lbl = tk.Label(cf, width=8, anchor="w", font=(f, PalEditConfig.ftsize - 8))
+            cur_lbl.grid(row=r, column=1, sticky="w", padx=2)
+            tk.Label(cf, text=str(base[key]), width=8, anchor="w",
+                     font=(f, PalEditConfig.ftsize - 8)).grid(row=r, column=2, sticky="w", padx=2)
+            delta_lbl = tk.Label(cf, width=6, anchor="w", font=(f, PalEditConfig.ftsize - 8))
+            delta_lbl.grid(row=r, column=3, sticky="w", padx=2)
+            combat_rows.append((key, cur_lbl, base[key], delta_lbl))
+
+        def resync_combat():
+            live = pal.CalculateIngameStats()
+            for key, cur_lbl, std, delta_lbl in combat_rows:
+                c = live[key]
+                d = c - std
+                cur_lbl.config(text=str(c))
+                dtxt = f"+{d}" if d > 0 else (str(d) if d < 0 else "—")
+                delta_lbl.config(text=dtxt,
+                                 fg=("#2b8a3e" if d > 0 else ("#c92a2a" if d < 0 else "black")))
+        resync_combat()
+
+        def after_edit():
+            # apply already happened; keep the HP ceiling, the main window and
+            # this popup's computed columns all in step
+            self.handleMaxHealthUpdates(pal)
+            self.refresh(i)
+            resync_combat()
+
+        def edit_row(parent, r, label, getter, setter, lo, hi, width_lbl=13):
+            tk.Label(parent, text=label, width=width_lbl, anchor="w",
+                     font=(f, PalEditConfig.ftsize - 8)).grid(row=r, column=0, sticky="w", padx=2)
+            var = tk.StringVar(value=str(getter()))
+            sb = tk.Spinbox(parent, from_=lo, to=hi, width=6, textvariable=var,
+                            font=(f, PalEditConfig.ftsize - 8))
+            sb.grid(row=r, column=1, sticky="w", padx=2)
+
+            def commit(*_):
+                try:
+                    v = int(float(var.get()))
+                except (ValueError, tk.TclError):
+                    v = getter()
+                v = max(lo, min(hi, v))
+                var.set(str(v))
+                if v != getter():
+                    setter(v)
+                    after_edit()
+            sb.config(command=commit)      # arrow buttons
+            sb.bind("<Return>", commit)    # typed value, committed on Enter
+            sb.bind("<FocusOut>", commit)  # or on leaving the field
+            return sb
 
         vf = section("IVs / Talents  (0-100, inherited in breeding)")
-        for r, (label, val) in enumerate((("HP", pal.GetTalentHP()),
-                                          ("Attack", pal.GetAttackRanged()),
-                                          ("Defense", pal.GetDefence()))):
-            grid_row(vf, r, (label, str(val)), (11, 8))
+        edit_row(vf, 0, "HP", pal.GetTalentHP, pal.SetTalentHP, 0, 100, width_lbl=11)
+        edit_row(vf, 1, "Attack", pal.GetAttackRanged, pal.SetAttackRanged, 0, 100, width_lbl=11)
+        edit_row(vf, 2, "Defence", pal.GetDefence, pal.SetDefence, 0, 100, width_lbl=11)
 
-        sf = section("Souls & condensation")
-        for r, (label, val) in enumerate((("Soul HP", pal.GetRankHP()),
-                                          ("Soul Attack", pal.GetRankAttack()),
-                                          ("Soul Defence", pal.GetRankDefence()),
-                                          ("Soul Work", pal.GetRankWorkSpeed()),
-                                          ("Condensation", f"{pal.GetRank()} of 5"))):
-            grid_row(sf, r, (label, str(val)), (13, 8))
+        sf = section("Souls  (0-20)  &  condensation")
+        edit_row(sf, 0, "Soul HP", pal.GetRankHP, pal.SetRankHP, 0, 20)
+        edit_row(sf, 1, "Soul Attack", pal.GetRankAttack, pal.SetRankAttack, 0, 20)
+        edit_row(sf, 2, "Soul Defence", pal.GetRankDefence, pal.SetRankDefence, 0, 20)
+        edit_row(sf, 3, "Soul Work", pal.GetRankWorkSpeed, pal.SetRankWorkSpeed, 0, 20)
+        # condensation is stored 1..5 internally; show it as the in-game 0..4 stars
+        edit_row(sf, 4, "Condensation ★", lambda: pal.GetRank() - 1,
+                 lambda v: pal.SetRank(v + 1), 0, 4)
 
         tk.Button(top, text="Close", command=top.destroy,
                   font=(f, PalEditConfig.ftsize - 6)).pack(pady=6)
