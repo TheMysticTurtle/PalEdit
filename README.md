@@ -103,9 +103,12 @@ added Pals sit on the Global side; move them into a local box to use them:
   ![A newly added Pal reconstructing on its cooldown in the local box](docs/images/add-new-pal.png)
 
 > [!TIP]
-> If the game is already running when you edit, reopen the Global Palbox terminal
-> afterwards so it re-reads the file. If anything ever looks off, you still have the
-> automatic `PalEdit-backups` copy (and your own backup) to fall back on.
+> **Edit with Palworld closed.** Close the game before you load your save in PalEdit,
+> and launch it again once you've saved. While the game is running it keeps the palbox
+> in memory and can overwrite your changes on its next autosave, so editing with it
+> shut is the safe way to go. Your edits appear the next time you open the *Pal Genetic
+> Data* terminal — and if anything ever looks off, you still have the automatic
+> `PalEdit-backups` copy (and your own backup) to fall back on.
 
 ## **💾 Adding, cloning & deleting Pals**
 
