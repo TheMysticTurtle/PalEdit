@@ -48,7 +48,7 @@
 - [**🚀 Installation**](#-installation)
 - [**⚠️ A word of warning**](#️-a-word-of-warning)
 - [**🕹️ Usage**](#️-usage)
-- [**💾 Cloning Pals**](#-cloning-pals)
+- [**💾 Adding, cloning & deleting Pals**](#-adding-cloning--deleting-pals)
 - [**📦 Backing up your save**](#-backing-up-your-save)
 - [**🛠️ Building from source (on Windows)**](#️-building-from-source-on-windows)
 - [**🚧 Project roadmap**](#-project-roadmap)
@@ -65,27 +65,59 @@ Download the compiled executable from [Nexus Mods](https://www.nexusmods.com/pal
 
 ## **🕹️ Usage**
 
-1. Open PalEdit
-2. Select your save file
-3. Edit your Pals
-4. Save
-5. Done
+This fork focuses on your **Global Palbox** — the shared Pal storage you reach
+through the *Pal Genetic Data* terminal in-game.
 
-## **💾 Cloning Pals**
+1. **Download & run.** Grab the latest build from the [Releases page](https://github.com/EternalWraith/PalEdit/releases) (or [Nexus Mods](https://www.nexusmods.com/palworld/mods/104)), extract the zip into a folder anywhere, and run **`PalEdit.exe`**.
+2. **Load your save.** Choose **File → Load Save** and open your **`GlobalPalStorage.sav`**. On Windows it lives at:
 
-1. Load a save
-2. Select a Pal
-3. Click "Dump Pal", and choose a filename (any name)
-4. Click "Add Pal" and select the file you just made
-5. Edit the clone
+    ```
+    %LocalAppData%\Pal\Saved\SaveGames\<your-account-id>\GlobalPalStorage.sav
+    ```
+
+    (there's one numbered folder per account — see [Backing up your save](#-backing-up-your-save) for how to find it.)
+3. **Edit away.** You'll see every Pal in your Global Palbox. Select one to change its level, stats/IVs, souls, moves, passives, nickname or species, or use **Add New Pal**, **Clone Pal** and **Delete Pal** to manage the box (see [Adding, cloning & deleting Pals](#-adding-cloning--deleting-pals)).
+4. **Save.** Choose **File → Save**. The first save of each session automatically copies your original file into a `PalEdit-backups` folder next to it, just in case.
+5. **Pick your changes up in-game** — see below.
+
+### 🎮 Getting your edits into the game
+
+Open the **Global Palbox** at a *Pal Genetic Data* terminal. Your edited and newly
+added Pals sit on the Global side; move them into a local box to use them:
+
+- **Edited an existing Pal?** Drag it from the Global Palbox into your local box — the changes are there **right away**.
+- **Added a brand-new Pal?** Drag it onto an **empty slot** in your local box. Freshly reconstructed Pals sit on a short cooldown (around **10 minutes**); once it finishes they behave just like any other Pal.
+
+> [!TIP]
+> If the game is already running when you edit, reopen the Global Palbox terminal
+> afterwards so it re-reads the file. If anything ever looks off, you still have the
+> automatic `PalEdit-backups` copy (and your own backup) to fall back on.
+
+## **💾 Adding, cloning & deleting Pals**
+
+Right in the Global Palbox, next to the portrait:
+
+- **Clone Pal** — makes an exact copy of the selected Pal in a free slot. Great for duplicating a favourite before experimenting.
+- **Add New Pal** — drops a fresh Pal into the box (it starts as a default species; change it with the **Species** picker, then edit its level, moves, passives and stats to taste).
+- **Delete Pal** — clears the selected slot after a confirmation.
+
+Cloned and newly added Pals arrive through the same in-game flow as above: drag them
+onto an empty slot in a local box, wait out the short reconstruction cooldown, and
+they're ready to go.
 
 ## **📦 Backing up your save**
 
-It is advised that you backup ALL save files before using the tool. Although the tool will eventually do this on its own, it doesn't yet.
+This fork automatically copies the loaded save into a `PalEdit-backups` folder (next
+to the save) before its first write each session. That's a safety net, not a
+replacement for your own backups — it's still wise to keep a copy of your save files
+somewhere safe before editing.
 
-On Windows, the saves can be found in the following locations:
+On Windows, the saves can be found here:
 
 - `%LocalAppData%\Pal\Saved\SaveGames\`
+
+You'll find one folder per account (a long numbered name); your **`GlobalPalStorage.sav`**
+is inside it.
 
 If you’ve installed Palworld via Steam, you can also access your save files by following these steps:
 
