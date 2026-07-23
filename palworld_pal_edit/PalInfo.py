@@ -227,13 +227,14 @@ class PalEntity:
                 typename = "LazyCatfish"
 
         # print(f"Debug: typename2 - '{typename}'")
-        if typename.lower() == "sheepball":
-            print(typename)
-            typename = "SheepBall"
-
-            # Strangely, Boss and Lucky Lamballs have camelcasing
-            # Regular ones... don't
-        # print(f"Debug: typename3 - '{typename}'")
+        # Match the species by CharacterID, tolerating a casing difference
+        # between the save and our data. Unreal treats these names
+        # case-insensitively, so e.g. the game's "SheepBall" (Lamball) resolves
+        # to a data key stored as "Sheepball" instead of failing to load. This
+        # replaces the old per-species SheepBall fix-up and covers any pal
+        # whose data casing drifts from the save.
+        if typename not in PalSpecies and typename.lower() in PalSpeciesLower:
+            typename = PalSpeciesLower[typename.lower()]
 
         self._type = PalSpecies[typename]
         if self.IsHuman() and ogtypename[:5].lower() == "boss_":
@@ -1062,12 +1063,15 @@ with open("%s/resources/data/elements.json" % (module_dir), "r", encoding="utf8"
         PalElements[i['Name']] = i['Color']
 
 PalSpecies = {}
+# lowercase CodeName -> canonical CodeName, so a save's CharacterID can be
+# matched case-insensitively (Unreal FNames compare without regard to case)
+PalSpeciesLower = {}
 # PalLearnSet: Pal Skills require Level
 PalLearnSet = {}
 
 
 def LoadPals(lang="en-GB"):
-    global PalSpecies, PalLearnSet
+    global PalSpecies, PalLearnSet, PalSpeciesLower
 
     if lang == "":
         lang = "en-GB"
@@ -1112,6 +1116,9 @@ def LoadPals(lang="en-GB"):
                 PalSpecies[i["CodeName"]]._suits = PalSpecies[i["CodeName"].replace("GYM_", "")]._suits
                 PalSpecies[i["CodeName"]]._scaling = PalSpecies[i["CodeName"].replace("GYM_", "")]._scaling
             PalLearnSet[i["CodeName"]] = i["Moveset"] if not t else PalLearnSet[i["CodeName"].replace("GYM_", "")]
+
+        # index by lowercased CodeName for the case-insensitive lookup below
+        PalSpeciesLower = {code.lower(): code for code in PalSpecies}
 
 
 LoadPals()
