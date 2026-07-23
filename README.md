@@ -22,7 +22,7 @@
 
 ## ✨ What's new in the 1.0 update
 
-- 🐣 **Full Palworld 1.0 support** — reads & writes the new save format, loads the **Global Palbox** (`GlobalPalStorage.sav`), refreshed 1.0 species / moves / passives / icons, level cap raised to 80.
+- 🐣 **Palworld 1.0 - GlobalPalBox support** — reads & writes the new save format, loads the **Global Palbox** (`GlobalPalStorage.sav`), refreshed 1.0 species / moves / passives / icons, level cap raised to 80.
 - 🛡️ **Save-safe** — opening a file and saving it back changes *nothing* unless you actually edit something (verified with a field-by-field comparison of every pal). It also tidies up leftover data from earlier versions — including the issue that made unassigned pals idly **"graze"** and produce nothing.
 - 📦 **Global Palbox management** — **add, clone, delete, and rename** pals right in the box.
 - 🔎 **Searchable everything:**
