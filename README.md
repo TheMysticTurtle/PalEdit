@@ -68,6 +68,15 @@ Download the compiled executable from [Nexus Mods](https://www.nexusmods.com/pal
 This fork focuses on your **Global Palbox** — the shared Pal storage you reach
 through the *Pal Genetic Data* terminal in-game.
 
+> [!IMPORTANT]
+> **The Global Palbox (`GlobalPalStorage.sav`) is the only save file tested and
+> working right now.** Editing a world's `Level.sav` isn't enabled yet — the
+> groundwork and the remaining steps are written up in
+> [docs/save-editing-analysis.md](docs/save-editing-analysis.md). Please stick to
+> the Global Palbox for now, and keep a backup.
+
+![The PalEdit window editing a Pal in the Global Palbox](docs/images/paledit-window.png)
+
 1. **Download & run.** Grab the latest build from the [Releases page](https://github.com/EternalWraith/PalEdit/releases) (or [Nexus Mods](https://www.nexusmods.com/palworld/mods/104)), extract the zip into a folder anywhere, and run **`PalEdit.exe`**.
 2. **Load your save.** Choose **File → Load Save** and open your **`GlobalPalStorage.sav`**. On Windows it lives at:
 
@@ -85,8 +94,13 @@ through the *Pal Genetic Data* terminal in-game.
 Open the **Global Palbox** at a *Pal Genetic Data* terminal. Your edited and newly
 added Pals sit on the Global side; move them into a local box to use them:
 
-- **Edited an existing Pal?** Drag it from the Global Palbox into your local box — the changes are there **right away**.
-- **Added a brand-new Pal?** Drag it onto an **empty slot** in your local box. Freshly reconstructed Pals sit on a short cooldown (around **10 minutes**); once it finishes they behave just like any other Pal.
+- **Edited an existing Pal?** Drag it from the Global Palbox into your local box — the changes are there **right away**. The game shows the new genetic data next to what it's replacing:
+
+  ![Transferring an edited Pal — new genetic data vs the data being overwritten](docs/images/update-existing-pal.png)
+
+- **Added a brand-new Pal?** Drag it onto an **empty slot** in your local box. Freshly reconstructed Pals sit on a short cooldown (around **10 minutes**), after which they behave just like any other Pal:
+
+  ![A newly added Pal reconstructing on its cooldown in the local box](docs/images/add-new-pal.png)
 
 > [!TIP]
 > If the game is already running when you edit, reopen the Global Palbox terminal
