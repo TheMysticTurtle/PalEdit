@@ -762,7 +762,7 @@ class PalEdit():
                               fg=PalInfo.PalGender.MALE.value if g == "Male ♂" else PalInfo.PalGender.FEMALE.value)
 
         self.title.config(text=f"{pal.GetNickname()}")
-        self.level.config(text=f"Lv. {pal.GetLevel() if pal.GetLevel() > 0 else '?'}")
+        self.levelvar.set(str(pal.GetLevel()) if pal.GetLevel() > 0 else "?")
 
         self._fruit_all = [PalInfo.PalAttacks[aval] for aval in self.availableAttacks(pal)]
         self.fruitOptions['values'] = self._fruit_all
@@ -1502,6 +1502,28 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         pal.SetLevel(lv)
         self.handleMaxHealthUpdates(pal)
         self.refresh(i)
+
+    def setlevelfromentry(self, *_):
+        """Set the level from whatever was typed into the level field, on Enter
+        or focus-out. Non-numbers are ignored and the field snaps back to the
+        pal's real level; valid input is clamped to 1..level cap. The ➖ / ➕
+        buttons keep working and the field follows along."""
+        if not self.isPalSelected():
+            return
+        i = int(self.listdisplay.curselection()[0])
+        pal = self.FilteredPals()[i]
+        try:
+            lv = int(self.levelvar.get())
+        except (ValueError, tk.TclError):
+            self.levelvar.set(str(pal.GetLevel()) if pal.GetLevel() > 0 else "?")
+            return
+        lv = max(1, min(PalEditConfig.levelcap, lv))
+        if lv != pal.GetLevel():
+            pal.SetLevel(lv)
+            self.handleMaxHealthUpdates(pal)
+            self.refresh(i)
+        else:
+            self.levelvar.set(str(lv))  # normalise (clamp / stray whitespace)
 
     # ------------------------------------------------------------------
     # Custom passive-skill presets (build named sets, stamp onto pals)
@@ -2788,12 +2810,27 @@ Do you want to use %s's DEFAULT Scaling (%s)?
         headerframe.grid_columnconfigure((0, 2), uniform="equal")
         headerframe.grid_columnconfigure(1, weight=1)
 
-        self.level = tk.Label(headerframe, text=f"v{PalEditConfig.version}", bg="darkgrey",
-                              font=(PalEditConfig.font, 24),
-                              width=17)
-        self.level.bind("<Enter>", lambda evt, num="owner": self.changetext(num))
-        self.level.bind("<Leave>", lambda evt, num=-1: self.changetext(num))
-        self.level.grid(row=0, column=1, sticky="nsew")
+        # "Lv." label + a typeable entry: type a level and press Enter (or click
+        # away) to set it directly; the ➖ / ➕ buttons still work and the field
+        # updates to match
+        lvlframe = tk.Frame(headerframe, bg="darkgrey")
+        lvlframe.grid(row=0, column=1, sticky="nsew")
+        lvlframe.grid_rowconfigure(0, weight=1)
+        lvlframe.grid_columnconfigure(0, weight=1)
+        lvlframe.grid_columnconfigure(3, weight=1)
+        lvllabel = tk.Label(lvlframe, text="Lv.", bg="darkgrey", font=(PalEditConfig.font, 24))
+        lvllabel.grid(row=0, column=1)
+        self.levelvar = tk.StringVar()
+        self.level = tk.Entry(lvlframe, textvariable=self.levelvar, width=4, justify="center",
+                              font=(PalEditConfig.font, 24), relief="flat", bd=0,
+                              highlightthickness=0, bg="darkgrey", disabledbackground="darkgrey")
+        self.level.grid(row=0, column=2)
+        self.level.bind("<Return>", self.setlevelfromentry)
+        self.level.bind("<FocusOut>", self.setlevelfromentry)
+        # keep the owner-on-hover readout that the old level label had
+        for _w in (lvlframe, lvllabel, self.level):
+            _w.bind("<Enter>", lambda evt, num="owner": self.changetext(num))
+            _w.bind("<Leave>", lambda evt, num=-1: self.changetext(num))
 
         minlvlbtn = tk.Button(headerframe, text="➖", borderwidth=1, font=(PalEditConfig.font, PalEditConfig.ftsize - 2),
                               command=self.takelevel,
