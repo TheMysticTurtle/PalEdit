@@ -52,7 +52,7 @@
 
 ## **🚀 Installation**
 
-Download the compiled executable from [Nexus Mods](https://www.nexusmods.com/palworld/mods/104) or over on the [Releases Page](https://github.com/EternalWraith/PalEdit/releases).
+Download the compiled executable from [Releases Page](https://github.com/TheMysticTurtle/PalEdit/releases).
 
 ## **⚠️ A word of warning**
 
@@ -74,7 +74,7 @@ through the *Pal Genetic Data* terminal in-game.
 
 ![The PalEdit window editing a Pal in the Global Palbox](docs/images/paledit-window.png)
 
-1. **Download & run.** Grab the latest build from the [Releases page](https://github.com/EternalWraith/PalEdit/releases) (or [Nexus Mods](https://www.nexusmods.com/palworld/mods/104)), extract the zip into a folder anywhere, and run **`PalEdit.exe`**.
+1. **Download & run.** Grab the latest build from the [Releases page](https://github.com/TheMysticTurtle/PalEdit/releases), extract the zip into a folder anywhere, and run **`PalEdit.exe`**.
 2. **Load your save.** Choose **File → Load Save** and open your **`GlobalPalStorage.sav`**. On Windows it lives at:
 
     ```
